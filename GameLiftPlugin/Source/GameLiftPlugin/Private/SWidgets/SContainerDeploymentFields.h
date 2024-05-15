@@ -8,7 +8,6 @@
 #include "Input/Reply.h"
 #include "Styling/SlateColor.h"
 #include "Types/FTextIntPair.h"
-#include "Types/EFleetOperatingSystem.h"
 
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Widgets/SWidget.h"
@@ -18,23 +17,14 @@
 class SPathInput;
 class SSelectionComboBox;
 
-class SDeploymentFields : public SCompoundWidget
+class SContainerDeploymentFields : public SCompoundWidget
 {
-	SLATE_BEGIN_ARGS(SDeploymentFields) {}
+	SLATE_BEGIN_ARGS(SContainerDeploymentFields) {}
 
 	SLATE_END_ARGS()
 
 public:
-	enum class Modes
-	{
-		GameNameOnly,
-		Full
-	};
-
 	void Construct(const FArguments& InArgs);
-
-	void SetGameOnlyMode();
-	void SetFullMode();
 
 	void SetContainerGroupDefinitionName(const FText& Name);
 	void SetContainerImageURI(const FText& Path);
@@ -42,40 +32,23 @@ public:
 	void SetOutConfigFilePath(const FText& Path);
 
 	const FText& GetContainerGroupDefinitionName() const;
-	FText GetBuildOperatingSystem() const;
-	const FText& GetBuildFilePath() const;
+	const FText& GetContainerImageURI() const;
 	const FText& GetExtraServerResourcesPath() const;
 	const FText& GetOutConfigFilePath() const;
-	Modes GetCurrentState() const;
 
 private:
-	int32 GetSetupStateAsInt() const;
-
-	void OnBuildingSupportedOperatingSystemValues(TArray<FTextIntPair>& Items);
-	void OnOperatingSystemSelected(int SelectionId, const FTextIntPair& Item);
-
-private:
-	TSharedPtr<SSelectionComboBox> MakeBuildOperatingSystem();
-
-	Modes CachedState = Modes::Full;
-
-	TArray<EFleetOperatingSystem> SupportedOperatingSystems;
-	int CurrentOperatingSystemSelected = 0;
-
-	TSharedPtr<SPathInput> BuildNameInput;
-	TSharedPtr<SSelectionComboBox> BuildOperatingSystemInput;
-	TSharedPtr<SPathInput> BuildFolderPathInput;
-	TSharedPtr<SPathInput> BuildFilePathInput;
+	TSharedPtr<SPathInput> ContainerGroupDefinitionNameInput;
+	TSharedPtr<SPathInput> ContainerImageURIInput;
 	TSharedPtr<SPathInput> ExtraServerResourcesPathInput;
 	TSharedPtr<SPathInput> OutConfigFilePathInput;
 };
 
-TSharedRef<SDeploymentFields> AsSDeploymentFieldsRef(TSharedPtr<SWidget> WidgetToCast)
+inline TSharedRef<SContainerDeploymentFields> AsSContainerDeploymentFieldsRef(TSharedPtr<SWidget> WidgetToCast)
 {
-	return StaticCastSharedRef<SDeploymentFields>(WidgetToCast.ToSharedRef());
+	return StaticCastSharedRef<SContainerDeploymentFields>(WidgetToCast.ToSharedRef());
 }
 
-TSharedRef<SDeploymentFields> AsSDeploymentFieldsRef(TSharedRef<SWidget> WidgetToCast)
+inline TSharedRef<SContainerDeploymentFields> AsSContainerDeploymentFieldsRef(TSharedRef<SWidget> WidgetToCast)
 {
-	return StaticCastSharedRef<SDeploymentFields>(WidgetToCast);
+	return StaticCastSharedRef<SContainerDeploymentFields>(WidgetToCast);
 }

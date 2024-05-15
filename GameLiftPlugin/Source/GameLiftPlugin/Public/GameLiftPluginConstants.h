@@ -407,6 +407,22 @@ namespace Menu
 		}
 	} // namespace DeployManagedEC2
 
+	
+	namespace DeployContainers
+	{
+		static const auto kGameLiftContainersHelpLinkText = NSLOCTEXT("SGameLiftDeployContainerMenu", "GameLiftContainersHelpLinkText", "Help with GameLift Containers");
+		
+		static const auto kContainerGroupDefinitionNameTitle = NSLOCTEXT("SContainerDeploymentFields", "ContainerGroupDefinitionName_Title", "Container Group Definition Name");
+		static const auto kContainerGroupDefinitionNameText = NSLOCTEXT("SContainerDeploymentFields", "ContainerGroupDefinitionName_Text", "Container Group Definition Name");
+		static const auto kContainerGroupDefinitionNameHint = NSLOCTEXT("SContainerDeploymentFields", "ContainerGroupDefinitionName_Hint", "Container Group Definition Name");
+		
+		static const auto kContainerGroupDefinitionNameInstructionText = NSLOCTEXT("SContainerDeploymentFields", "ContainerGroupDefinitionName_InstructionText", "The CGD name must have 1-12 characters.");
+		
+		static const auto kContainerImageURITitle = NSLOCTEXT("SContainerDeploymentFields", "ContainerImageURI_Title", "Container Image URI (within ECR)");
+		static const auto kContainerImageURIText = NSLOCTEXT("SContainerDeploymentFields", "ContainerImageURI_Text", "Container Image URI ");
+		static const auto kContainerImageURIHint = NSLOCTEXT("SContainerDeploymentFields", "ContainerImageURI_Hint", "URI referencing a Container Image in ECR which contains your game server.");
+	} // namespace DeployContainers
+
 	static const auto kErrorUserMessageWithLog = NSLOCTEXT("FGameLiftPluginModule", "ErrorUserMessageWithLog", "For more information, see `Output Log`");
 	static const auto kErrorUserMessageNoLog = NSLOCTEXT("FGameLiftPluginModule", "ErrorUserMessageNoLog", "Unknown failure, for more information, see `Output Log`. \nError code is:");
 } // namespace Menu
@@ -617,6 +633,7 @@ namespace Url
 	static const auto kGameLiftHowToDeployYourFirstGameUrl = TEXT("https://docs.aws.amazon.com/gamelift/latest/developerguide/unreal-plugin-ec2-scenarios.html");
 	static const auto kGameLiftEndpointsUrl = TEXT("https://docs.aws.amazon.com/general/latest/gr/gamelift.html");
 	static const auto kGameLiftPricingPlanUrl = TEXT("https://aws.amazon.com/gamelift/pricing/");
+	static const auto kGameLiftContainersHelpUrl = TEXT("https://docs.aws.amazon.com/gamelift/latest/developerguide/containers-intro.html");
 	static const auto kAwsAccountCreateAwsAccountUrl = TEXT("https://repost.aws/knowledge-center/create-and-activate-aws-account");
 
 	static const auto kHowToIntegrateYourGameForAnywhereUrl = TEXT("http://docs.aws.amazon.com/gamelift/latest/developerguide/unreal-plugin-anywhere-integrate.html");

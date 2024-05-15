@@ -4,37 +4,22 @@
 #include "SGameLiftDeployContainerMenu.h"
 
 #include <Widgets/SBoxPanel.h>
-#include <Widgets/Text/SRichTextBlock.h>
-#include "Widgets/Layout/SWidgetSwitcher.h"
-#include <Framework/MetaData/DriverMetaData.h>
 
 #include "SCommonMenuSections.h"
-#include "SWidgets/SBootstrapStatus.h"
-#include "SWidgets/SDeploymentFields.h"
+#include "SWidgets/SContainerDeploymentFields.h"
 #include "SWidgets/SDeploymentStatus.h"
 #include "SWidgets/SNamedRow.h"
 #include "SWidgets/SOnlineHyperlink.h"
-#include "SWidgets/SPathInput.h"
 #include "SWidgets/SSectionsWithHeaders.h"
 #include "SWidgets/SSetupMessage.h"
-#include "SWidgets/STextStatus.h"
 #include "SWidgets/SSelectionComboBox.h"
 #include "SWidgets/STextSeparator.h"
 
-#include "Settings/UGameLiftDeploymentStatus.h"
 #include "Settings/UGameLiftInternalSettings.h"
-#include "Settings/UGameLiftSettings.h"
 
-#include "Utils/Misc.h"
-#include "Utils/Notifier.h"
-#include "Utils/StringPaths.h"
 #include <Async/Async.h>
 
-#include "Types/EDeploymentMessageState.h"
-
-#include "IGameLiftCoreModule.h"
-#include "GameLiftPlugin.h"
-#include <Developer/Settings/Public/ISettingsModule.h>
+#include "Settings/UGameLiftDeploymentStatus.h"
 
 #define LOCTEXT_NAMESPACE "SGameLiftDeployContainerContent"
 
@@ -93,12 +78,96 @@ void SGameLiftDeployContainerMenu::Construct(const FArguments& InArgs)
 
 TSharedRef<SWidget> SGameLiftDeployContainerMenu::CreateSelectDeploymentScenarioSection()
 {
-	return SGameLiftDeployManagedEC2Menu::CreateSelectDeploymentScenarioSection();
+	return SNew(SVerticalBox)
+		+ SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(SPadding::Top_Bottom + SPadding::Right2x)
+		[
+			SNew(STextBlock)
+			.Text(Menu::DeployManagedEC2::kSelectScenarioDescription)
+			.AutoWrapText(true)
+			.TextStyle(FGameLiftPluginStyle::Get(), Style::Text::kParagraph)
+		]
+		// Links
+		+ SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(SPadding::Top_Bottom + SPadding::Right2x)
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.HAlign(HAlign_Left)
+			[
+				SNew(SOnlineHyperlink)
+				.Text(Menu::DeployManagedEC2::kGameLiftHowToDeployYourFirstGameLinkText)
+				.Link(Url::kGameLiftHowToDeployYourFirstGameUrl)
+			]
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.HAlign(HAlign_Center)
+			[
+				SNew(STextSeparator).Separator(TEXT("|"))
+			]
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.HAlign(HAlign_Left)
+			[
+				SNew(SOnlineHyperlink)
+				.Text(Menu::DeployManagedEC2::kGameLiftEndpointsLinkText)
+				.Link(Url::kGameLiftEndpointsUrl)
+			]
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.HAlign(HAlign_Center)
+			[
+				SNew(STextSeparator).Separator(TEXT("|"))
+			]
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.HAlign(HAlign_Left)
+			[
+				SNew(SOnlineHyperlink)
+				.Text(Menu::DeployManagedEC2::kGameLiftPricingPlanLinkText)
+				.Link(Url::kGameLiftPricingPlanUrl)
+			]
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.HAlign(HAlign_Center)
+			[
+				SNew(STextSeparator).Separator(TEXT("|"))
+			]
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.HAlign(HAlign_Left)
+			[
+				SNew(SOnlineHyperlink)
+				.Text(Menu::DeployContainers::kGameLiftContainersHelpLinkText)
+				.Link(Url::kGameLiftContainersHelpUrl)
+			]
+		]
+		+ SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(SPadding::Top_Bottom + SPadding::Right2x)
+		[
+			SNew(SNamedRow)
+			.NameText(Menu::DeployManagedEC2::kSelectScenarioTitle)
+			.RowWidget(
+				SNew(SSelectionComboBox)
+				.OnListBuilding_Raw(this, &SGameLiftDeployContainerMenu::OnBuildingDeploymentScenarioValues)
+				.OnItemSelected_Raw(this, &SGameLiftDeployContainerMenu::OnDeploymentScenarioSelected)
+			)
+		];
 }
 
 TSharedRef<SWidget> SGameLiftDeployContainerMenu::CreateGameParametersSection()
 {
-	return SGameLiftDeployManagedEC2Menu::CreateGameParametersSection();
+	return SNew(SVerticalBox)
+		+ SVerticalBox::Slot()
+		.Padding(SPadding::Top_Bottom + SPadding::Right2x)
+		.AutoHeight()
+		[
+			SAssignNew(DeploymentFields, SContainerDeploymentFields)
+		];
 }
 
 TSharedRef<SWidget> SGameLiftDeployContainerMenu::CreateDeploySection()
@@ -118,7 +187,22 @@ void SGameLiftDeployContainerMenu::BuildScenarioValues()
 
 void SGameLiftDeployContainerMenu::SetDefaultValues()
 {
-	SGameLiftDeployManagedEC2Menu::SetDefaultValues();
+	UGameLiftDeploymentStatus* DeploySettings = GetMutableDefault<UGameLiftDeploymentStatus>();
+
+	auto DeploymentInfo = AsSContainerDeploymentFieldsRef(DeploymentFields);
+	DeploymentInfo->SetContainerGroupDefinitionName(DeploySettings->ContainerGroupDefinitionName);
+	DeploymentInfo->SetContainerImageURI(DeploySettings->ContainerImageURI);
+	DeploymentInfo->SetExtraServerResourcesPath(DeploySettings->ContainerExtraServerResourcesPath);
+	DeploymentInfo->SetOutConfigFilePath(DeploySettings->ContainerOutConfigFilePath);
+
+	int previousScenarioSelected = ScenarioNames.FindLastByPredicate([&](const FText& name)
+	{
+		return name.EqualTo(DeploySettings->Scenario);
+	});
+	if (previousScenarioSelected != INDEX_NONE)
+	{
+		CurrentScenarioSelected = previousScenarioSelected;
+	}
 }
 
 #undef LOCTEXT_NAMESPACE
