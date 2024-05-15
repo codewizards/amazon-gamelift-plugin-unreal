@@ -382,7 +382,7 @@ namespace Menu
 		static const auto kApiGatewayEndpointTooltip = NSLOCTEXT("SDeploymentStatus", "ApiGatewayEndpoint_Tooltip", "Amazon API is an AWS service to create and use APIs. You can copy\nand paste this endpoint wherever you need to integrate with AWS and GameLift.");
 
 		// Client
-		static const auto kRunDeploymentGameInfoText = NSLOCTEXT("SGameLiftClientMenu", "ClientInfoText", "To run a sample game you need to specify Client path that your previously built.");
+		static const auto kRunDeploymentGameInfoText = NSLOCTEXT("SGameLiftClientMenu", "ClientInfoText", "To run a sample game you need to specify Client path that you have previously built.");
 
 		static const auto kDeployedGameClientRunningMessage = NSLOCTEXT("SGameLiftClientMenu", "ClientRunningMessage", "Deployed Game client has started locally");
 		static const auto kDeployedGameClientFailureMessage = NSLOCTEXT("SGameLiftClientMenu", "ClientFailureMessage", "Unable to start a Deployed Game client locally");
@@ -418,6 +418,9 @@ namespace Tabs
 	
 	static const auto kDeployManagedEC2TabTitle = NSLOCTEXT("FGameLiftDeployManagedEC2Tab", "FGameLiftDeployManagedEC2Tab_Title", "Deploy EC2 Fleet");
 	static const auto kDeployManagedEC2TabTooltip = NSLOCTEXT("FGameLiftDeployManagedEC2Tab", "FGameLiftDeployManagedEC2Tab_Tooltip", "Deploy the game with Amazon GameLift on a managed EC2 instance.");
+	
+	static const auto kDeployContainerTabTitle = NSLOCTEXT("FGameLiftDeployContainerTab", "FGameLiftDeployContainerTab_Title", "Deploy Container Fleet");
+	static const auto kDeployContainerTabTooltip = NSLOCTEXT("FGameLiftDeployContainerTab", "FGameLiftDeployContainerTab_Tooltip", "Deploy the game with Amazon GameLift Containers.");
 } // namespace Tabs
 
 namespace Defaults
