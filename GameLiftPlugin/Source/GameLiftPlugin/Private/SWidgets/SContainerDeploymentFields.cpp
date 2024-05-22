@@ -21,6 +21,14 @@ namespace Internal
 			.PathHint(Menu::DeployContainers::kContainerGroupDefinitionNameHint)
 			.ButtonVisibility(EVisibility::Collapsed);
 	}
+	
+	TSharedPtr<SPathInput> MakeContainerImageName()
+	{
+		return SNew(SPathInput)
+			.Title(Menu::DeployContainers::kContainerImageNameText)
+			.PathHint(Menu::DeployContainers::kContainerImageNameHint)
+			.ButtonVisibility(EVisibility::Collapsed);
+	}
 
 	TSharedPtr<SPathInput> MakeContainerImageURI()
 	{
@@ -52,12 +60,14 @@ namespace Internal
 void SContainerDeploymentFields::Construct(const FArguments& InArgs)
 {
 	ContainerGroupDefinitionNameInput = Internal::MakeContainerGroupDefinitionName();
+	ContainerImageNameInput = Internal::MakeContainerImageName();
 	ContainerImageURIInput = Internal::MakeContainerImageURI();
 	ExtraServerResourcesPathInput = Internal::MakeContainerExtraServerResourcesPath();
 	OutConfigFilePathInput = Internal::MakeContainerOutConfigFilePath();
 
 	TSharedPtr<SWidget> ContainerGroupDefinitionNameInputRow = SNew(SNamedRow)
-		.NameText(Menu::DeployContainers::kContainerGroupDefinitionNameTitle).RowWidget(ContainerGroupDefinitionNameInput);
+		.NameText(Menu::DeployContainers::kContainerGroupDefinitionNameTitle)
+		.RowWidget(ContainerGroupDefinitionNameInput);
 
 	TSharedPtr<SWidget> ContainerGroupDefinitionNameInstructionsRow = SNew(SNamedRow)
 		.SecondaryColumnLeftPadding(true)
@@ -66,13 +76,28 @@ void SContainerDeploymentFields::Construct(const FArguments& InArgs)
 			.Text(Menu::DeployContainers::kContainerGroupDefinitionNameInstructionText)
 			.TextStyle(FGameLiftPluginStyle::Get(), Style::Text::kNote)
 			.AutoWrapText(true)
+			);
+
+	TSharedPtr<SWidget> ContainerImageNameInputRow = SNew(SNamedRow)
+		.NameText(Menu::DeployContainers::kContainerImageNameTitle)
+		.RowWidget(ContainerImageNameInput);
+
+	TSharedPtr<SWidget> ContainerImageNameInstructionsRow = SNew(SNamedRow)
+		.SecondaryColumnLeftPadding(true)
+		.RowWidget(
+			SNew(STextBlock)
+			.Text(Menu::DeployContainers::kContainerImageNameInstructionText)
+			.TextStyle(FGameLiftPluginStyle::Get(), Style::Text::kNote)
+			.AutoWrapText(true)
 		);
 	
 	TSharedPtr<SWidget> ContainerImageURIInputRow = SNew(SNamedRow)
-		.NameText(Menu::DeployContainers::kContainerImageURITitle).RowWidget(ContainerImageURIInput);
+		.NameText(Menu::DeployContainers::kContainerImageURITitle)
+		.RowWidget(ContainerImageURIInput);
 
 	TSharedPtr<SWidget> ExtraServerResourcesPathInputRow = SNew(SNamedRow)
-		.NameText(Menu::DeployManagedEC2::kExtraServerResourcesPathTitle).RowWidget(ExtraServerResourcesPathInput);
+		.NameText(Menu::DeployManagedEC2::kExtraServerResourcesPathTitle)
+		.RowWidget(ExtraServerResourcesPathInput);
 
 	// Currently, this field does not work, so we hide it from users.
 	ExtraServerResourcesPathInputRow->SetVisibility(EVisibility::Collapsed);
@@ -91,6 +116,14 @@ void SContainerDeploymentFields::Construct(const FArguments& InArgs)
 		+ SVerticalBox::Slot().AutoHeight()
 		[
 			ContainerGroupDefinitionNameInstructionsRow.ToSharedRef()
+		]
+		+ SVerticalBox::Slot().AutoHeight()
+		[
+			ContainerImageNameInputRow.ToSharedRef()
+		]
+		+ SVerticalBox::Slot().AutoHeight()
+		[
+			ContainerImageNameInstructionsRow.ToSharedRef()
 		]
 		+ SVerticalBox::Slot().AutoHeight().Padding(SPadding::Top_Bottom)
 		[
@@ -119,6 +152,11 @@ void SContainerDeploymentFields::SetContainerGroupDefinitionName(const FText& Na
 	ContainerGroupDefinitionNameInput->SetSelectedPath(Name);
 }
 
+void SContainerDeploymentFields::SetContainerImageName(const FText& Name)
+{
+	ContainerImageNameInput->SetSelectedPath(Name);
+}
+
 void SContainerDeploymentFields::SetContainerImageURI(const FText& Path)
 {
 	ContainerImageURIInput->SetSelectedPath(Path);
@@ -137,6 +175,11 @@ void SContainerDeploymentFields::SetOutConfigFilePath(const FText& Path)
 const FText& SContainerDeploymentFields::GetContainerGroupDefinitionName() const
 {
 	return ContainerGroupDefinitionNameInput->GetSelectedPathRef();
+}
+
+const FText& SContainerDeploymentFields::GetContainerImageName() const
+{
+	return ContainerImageNameInput->GetSelectedPathRef();
 }
 
 const FText& SContainerDeploymentFields::GetContainerImageURI() const

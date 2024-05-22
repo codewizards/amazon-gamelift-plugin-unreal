@@ -33,6 +33,18 @@ namespace AwsScenarios
 		std::string LaunchPathParameter;
 	};
 
+	struct ContainerInstanceTemplateParams
+	{
+		std::string AccountId;
+		std::string ApiGatewayStageNameParameter;
+		std::string ContainerGroupDefinitionNameParameter;
+		std::string ContainerImageNameParameter;
+		std::string ContainerImageUriParameter;
+		std::string GameNameParameter;
+		std::string LambdaZipS3BucketParameter;
+		std::string LambdaZipS3KeyParameter;
+	};
+
 	class IAWSScenario
 	{
 	public:

@@ -411,16 +411,44 @@ namespace Menu
 	namespace DeployContainers
 	{
 		static const auto kGameLiftContainersHelpLinkText = NSLOCTEXT("SGameLiftDeployContainerMenu", "GameLiftContainersHelpLinkText", "Help with GameLift Containers");
-		
+
+		//Game Parameters
 		static const auto kContainerGroupDefinitionNameTitle = NSLOCTEXT("SContainerDeploymentFields", "ContainerGroupDefinitionName_Title", "Container Group Definition Name");
 		static const auto kContainerGroupDefinitionNameText = NSLOCTEXT("SContainerDeploymentFields", "ContainerGroupDefinitionName_Text", "Container Group Definition Name");
-		static const auto kContainerGroupDefinitionNameHint = NSLOCTEXT("SContainerDeploymentFields", "ContainerGroupDefinitionName_Hint", "Container Group Definition Name");
-		
+		static const auto kContainerGroupDefinitionNameHint = NSLOCTEXT("SContainerDeploymentFields", "ContainerGroupDefinitionName_Hint", "Name for the CGD to be generated from your Container Image");
 		static const auto kContainerGroupDefinitionNameInstructionText = NSLOCTEXT("SContainerDeploymentFields", "ContainerGroupDefinitionName_InstructionText", "The CGD name must have 1-12 characters.");
+		
+		static const auto kContainerImageNameTitle = NSLOCTEXT("SContainerDeploymentFields", "ContainerImageName_Title", "Container Image Name");
+		static const auto kContainerImageNameText = NSLOCTEXT("SContainerDeploymentFields", "ContainerImageName_Text", "Container Image Name");
+		static const auto kContainerImageNameHint = NSLOCTEXT("SContainerDeploymentFields", "ContainerImageName_Hint", "Name to reference the Container Image you use from ECR");
+		static const auto kContainerImageNameInstructionText = NSLOCTEXT("SContainerDeploymentFields", "ContainerImageName_InstructionText", "The Container Image name must have 1-12 characters.");
 		
 		static const auto kContainerImageURITitle = NSLOCTEXT("SContainerDeploymentFields", "ContainerImageURI_Title", "Container Image URI (within ECR)");
 		static const auto kContainerImageURIText = NSLOCTEXT("SContainerDeploymentFields", "ContainerImageURI_Text", "Container Image URI ");
 		static const auto kContainerImageURIHint = NSLOCTEXT("SContainerDeploymentFields", "ContainerImageURI_Hint", "URI referencing a Container Image in ECR which contains your game server.");
+
+		//Deplyment Parameters
+		static const auto kDeploymentEnabledTooltip = NSLOCTEXT("SGameLiftDeployContainerMenu", "kDeploymentEnabledTooltip", "Deployment can be triggered");
+		static const auto kDeploymentDisabledNeedBootstrapTooltip = NSLOCTEXT("SGameLiftDeployContainerMenu", "kDeploymentDisabledNeedBootstrapTooltip", "Account needs to be configured first");
+		static const auto kDeploymentDisabledCGDNameEmptyTooltip = NSLOCTEXT("SGameLiftDeployContainerMenu", "kDeploymentDisabledCGDNameEmptyTooltip", "Cannot deploy with empty CGD name");
+		static const auto kDeploymentDisabledContainerImageNameEmptyTooltip = NSLOCTEXT("SGameLiftDeployContainerMenu", "kDeploymentDisabledContainerImageNameEmptyTooltip", "Cannot deploy with empty Container Image name");
+		static const auto kDeploymentDisabledCGDNameTooLongTooltip = NSLOCTEXT("SGameLiftDeployContainerMenu", "kDeploymentDisabledCGDNameTooLongTooltip", "Cannot deploy CGD name with more than 12 characters");
+		static const auto kDeploymentDisabledContainerImageNameTooLongTooltip = NSLOCTEXT("SGameLiftDeployContainerMenu", "kDeploymentDisabledContainerImageNameTooLongTooltip", "Cannot deploy Container Image name with more than 12 characters");
+		static const auto kDeploymentDisabledContainerImageURINotSetTooltip = NSLOCTEXT("SGameLiftDeployContainerMenu", "kDeploymentDisabledContainerImageURINotSetTooltip", "Cannot deploy with empty Container Image URI");
+		static const auto kDeploymentDisabledAlreadyActiveTooltip = NSLOCTEXT("SGameLiftDeployContainerMenu", "kDeploymentDisabledAlreadyActiveTooltip", "Deployment cannot be triggered once it is in progress state");
+		
+		static const auto kDeploymentStartedAwsScenarioNotification = TEXT("Deploying GameLift scenario...");
+		static const auto kDeploymentStartedCustomScenarioNotification = TEXT("Deploying a custom GameLift scenario...");
+		static const auto kDeploymentAbortedNotification = TEXT("Aborting GameLift deployment...");
+		static const auto kDeploymentCompletedNotification = TEXT("GameLift deployment is completed.");
+		static const auto kDeploymentFailedNotification = TEXT("GameLift deployment is failed.");
+		
+		namespace Logs
+		{
+			static const auto kOutputPathChangedWarning = TEXT("Client Config File Output Path is not default");
+			static const auto kDeploymentSucceed = TEXT("Deployment succeed");
+			static const auto kDeploymentFailed = TEXT("Deployment failed");
+		}
 	} // namespace DeployContainers
 
 	static const auto kErrorUserMessageWithLog = NSLOCTEXT("FGameLiftPluginModule", "ErrorUserMessageWithLog", "For more information, see `Output Log`");

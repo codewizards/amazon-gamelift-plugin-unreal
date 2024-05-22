@@ -4,6 +4,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "IAWSScenariosDeployer.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Widgets/SCompoundWidget.h"
 
@@ -30,7 +31,7 @@ protected:
 	virtual TSharedRef<SWidget> CreateDeploySection();
 	virtual TSharedRef<SWidget> CreateLaunchClientSection();
 
-	virtual void BuildScenarioValues();
+	virtual void BuildScenarioValues(IAWSScenariosCategory Category);
  
 	virtual void OnBuildingDeploymentScenarioValues(TArray<FTextIntPair>& Items);
 	virtual void OnDeploymentScenarioSelected(int SelectionId, const FTextIntPair& Item);

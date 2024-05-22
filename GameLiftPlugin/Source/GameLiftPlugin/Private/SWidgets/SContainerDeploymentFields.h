@@ -27,17 +27,20 @@ public:
 	void Construct(const FArguments& InArgs);
 
 	void SetContainerGroupDefinitionName(const FText& Name);
+	void SetContainerImageName(const FText& Name);
 	void SetContainerImageURI(const FText& Path);
 	void SetExtraServerResourcesPath(const FText& Path);
 	void SetOutConfigFilePath(const FText& Path);
 
 	const FText& GetContainerGroupDefinitionName() const;
+	const FText& GetContainerImageName() const;
 	const FText& GetContainerImageURI() const;
 	const FText& GetExtraServerResourcesPath() const;
 	const FText& GetOutConfigFilePath() const;
 
 private:
 	TSharedPtr<SPathInput> ContainerGroupDefinitionNameInput;
+	TSharedPtr<SPathInput> ContainerImageNameInput;
 	TSharedPtr<SPathInput> ContainerImageURIInput;
 	TSharedPtr<SPathInput> ExtraServerResourcesPathInput;
 	TSharedPtr<SPathInput> OutConfigFilePathInput;

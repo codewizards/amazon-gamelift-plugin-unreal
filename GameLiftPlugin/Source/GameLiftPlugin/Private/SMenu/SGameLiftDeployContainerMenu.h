@@ -22,6 +22,9 @@ protected:
 	virtual TSharedRef<SWidget> CreateDeploySection() override;
 	virtual TSharedRef<SWidget> CreateLaunchClientSection() override;
 	
-	virtual void BuildScenarioValues() override;
+	virtual void BuildScenarioValues(IAWSScenariosCategory Category) override;
+	virtual void OnBuildingDeploymentScenarioValues(TArray<FTextIntPair>& Items) override;
+	
 	virtual void SetDefaultValues() override;
+	virtual FReply DeployCloudFormation() override;
 };

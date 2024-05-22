@@ -12,6 +12,8 @@ namespace AwsScenarios
 	class ScenarioWithParameters : public IAWSScenario
 	{
 	public:
+		virtual ~ScenarioWithParameters() = default;
+
 		virtual const char* const* GetParamNames() const override
 		{
 			static const char* paramNames[] =

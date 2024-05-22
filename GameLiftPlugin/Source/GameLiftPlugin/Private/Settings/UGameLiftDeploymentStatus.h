@@ -39,6 +39,8 @@ public:
 	UPROPERTY(config, EditAnywhere, Category = "Deployment Status")
 	FText ContainerGroupDefinitionName;
 	UPROPERTY(config, EditAnywhere, Category = "Deployment Status")
+	FText ContainerImageName;
+	UPROPERTY(config, EditAnywhere, Category = "Deployment Status")
 	FText ContainerImageURI;
 	UPROPERTY(config, EditAnywhere, Category = "Deployment Status")
 	FText ContainerExtraServerResourcesPath;
