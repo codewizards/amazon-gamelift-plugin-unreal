@@ -56,5 +56,18 @@ namespace AwsScenarios
 
 			return GameLiftAccountSaveFeatureInstanceTemplates(AwsAccountInstance->GetInstance(), ParamNames, ParamValues, Size);
 		}
+
+		virtual int SaveFeatureInstanceTemplate(IAWSAccountInstance* AwsAccountInstance, const InstanceTemplateParams& InParams)
+		{
+			return -1;
+		};
+		virtual int UploadGameServer(IAWSAccountInstance* AwsAccountInstance, const std::string& ServerFolderPath, const std::string& ExtraServerResourcesPath)
+		{
+			return -1;
+		};
+		virtual int CreateLaunchPathParameter(const FString& BuildOperatingSystem, const FString& BuildFolderPath, const FString& BuildFilePath, std::string& StdLaunchPathParameter)
+		{
+			return -1;
+		};
 	};
 } // namespace AwsScenarios
