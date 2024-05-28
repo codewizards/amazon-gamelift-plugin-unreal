@@ -61,12 +61,12 @@ namespace
 			return { false, Menu::DeployContainers::kDeploymentDisabledCGDNameEmptyTooltip };
 		}
 
-		if (AsSContainerDeploymentFieldsRef(DeploymentFields)->GetContainerGroupDefinitionName().ToString().Len() > Menu::DeployManagedEC2::kMaxGameNameLength)
+		if (AsSContainerDeploymentFieldsRef(DeploymentFields)->GetContainerGroupDefinitionName().ToString().Len() > Menu::DeployContainers::kMaxContainerNamesLength)
 		{
 			return { false, Menu::DeployContainers::kDeploymentDisabledCGDNameTooLongTooltip };
 		}
 
-		if (AsSContainerDeploymentFieldsRef(DeploymentFields)->GetContainerImageName().ToString().Len() > Menu::DeployManagedEC2::kMaxGameNameLength)
+		if (AsSContainerDeploymentFieldsRef(DeploymentFields)->GetContainerImageName().ToString().Len() > Menu::DeployContainers::kMaxContainerNamesLength)
 		{
 			return { false, Menu::DeployContainers::kDeploymentDisabledContainerImageNameTooLongTooltip };
 		}
@@ -74,6 +74,11 @@ namespace
 		if (AsSContainerDeploymentFieldsRef(DeploymentFields)->GetContainerImageURI().IsEmptyOrWhitespace())
 		{
 			return { false, Menu::DeployContainers::kDeploymentDisabledContainerImageURINotSetTooltip };
+		}
+
+		if (AsSContainerDeploymentFieldsRef(DeploymentFields)->GetContainerImageURI().IsEmptyOrWhitespace())
+		{
+			return { false, Menu::DeployContainers::kDeploymentDisabledIntraContainerLaunchPathNotSetTooltip };
 		}
 
 		bool IsDeploymentInProgress = AsSDeploymentStatusRef(DeploymentStatus)->GetCurrentState() == EDeploymentMessageState::InProgressMessage;
@@ -395,6 +400,7 @@ void SGameLiftDeployContainerMenu::SetDefaultValues()
 	DeploymentInfo->SetContainerGroupDefinitionName(DeploySettings->ContainerGroupDefinitionName);
 	DeploymentInfo->SetContainerImageName(DeploySettings->ContainerImageName);
 	DeploymentInfo->SetContainerImageURI(DeploySettings->ContainerImageURI);
+	DeploymentInfo->SetIntraContainerLaunchPath(DeploySettings->IntraContainerLaunchPath);
 	DeploymentInfo->SetExtraServerResourcesPath(DeploySettings->ContainerExtraServerResourcesPath);
 	DeploymentInfo->SetOutConfigFilePath(DeploySettings->ContainerOutConfigFilePath);
 
@@ -432,6 +438,7 @@ FReply SGameLiftDeployContainerMenu::DeployCloudFormation()
 	DeploySettings->ContainerGroupDefinitionName = DeploymentInfo->GetContainerGroupDefinitionName();
 	DeploySettings->ContainerImageName = DeploymentInfo->GetContainerImageName();
 	DeploySettings->ContainerImageURI = DeploymentInfo->GetContainerImageURI();
+	DeploySettings->IntraContainerLaunchPath = DeploymentInfo->GetIntraContainerLaunchPath();
 	DeploySettings->ExtraServerResourcesPath = DeploymentInfo->GetExtraServerResourcesPath();
 	DeploySettings->OutConfigFilePath = DeploymentInfo->GetOutConfigFilePath();
 	
@@ -464,8 +471,8 @@ FReply SGameLiftDeployContainerMenu::DeployCloudFormation()
 			DeploySettings->ContainerGroupDefinitionName.ToString(),
 			DeploySettings->ContainerImageName.ToString(),
 			DeploySettings->ContainerImageURI.ToString(),
-			DeploySettings->ContainerImageName.ToString(),
-			DeploySettings->OutConfigFilePath.ToString()
+			DeploySettings->IntraContainerLaunchPath.ToString(),
+			DeploySettings->ContainerImageName.ToString(), DeploySettings->OutConfigFilePath.ToString()
 		);
 	
 		UGameLiftDeploymentStatus* Settings = GetMutableDefault<UGameLiftDeploymentStatus>();

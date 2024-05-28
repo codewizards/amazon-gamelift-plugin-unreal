@@ -43,6 +43,7 @@ namespace AwsScenarios
 		std::string GameNameParameter;
 		std::string LambdaZipS3BucketParameter;
 		std::string LambdaZipS3KeyParameter;
+		std::string LaunchPathParameter;
 	};
 
 	class IAWSScenario

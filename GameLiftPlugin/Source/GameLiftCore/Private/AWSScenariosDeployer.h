@@ -35,8 +35,8 @@ public:
 		const FString& ContainerGroupDefinitionName,
 		const FString& ContainerImageName,
 		const FString& ContainerImageUri,
-		const FString& GameName,
-		const FString& OutConfigFilePath
+		const FString& IntraContainerLaunchPath,
+		const FString& GameName, const FString& OutConfigFilePath
 	) override;
 
 	bool StopDeployment(IAWSAccountInstance* AwsAccountInstance) override;

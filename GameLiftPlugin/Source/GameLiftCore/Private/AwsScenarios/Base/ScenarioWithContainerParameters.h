@@ -25,7 +25,8 @@ namespace AwsScenarios
 				"ContainerImageUriParameter",
 				"GameNameParameter",
 				"LambdaZipS3BucketParameter",
-				"LambdaZipS3KeyParameter"
+				"LambdaZipS3KeyParameter",
+				"LaunchPathParameter"
 			};
 			return paramNames;
 		}
@@ -48,7 +49,8 @@ namespace AwsScenarios
 				InParams.ContainerImageUriParameter.c_str(),
 				InParams.GameNameParameter.c_str(),
 				InParams.LambdaZipS3BucketParameter.c_str(),
-				InParams.LambdaZipS3KeyParameter.c_str()
+				InParams.LambdaZipS3KeyParameter.c_str(),
+				InParams.LaunchPathParameter.c_str()
 			};
 
 			auto* ParamNames = GetParamNames();

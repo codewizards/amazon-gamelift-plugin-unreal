@@ -38,6 +38,14 @@ namespace Internal
 			.ButtonVisibility(EVisibility::Collapsed);
 	}
 
+	TSharedPtr<SPathInput> MakeIntraContainerLaunchPath()
+	{
+		return SNew(SPathInput)
+			.Title(Menu::DeployContainers::kIntraContainerLaunchPathText)
+			.PathHint(Menu::DeployContainers::kIntraContainerLaunchPathHint)
+			.ButtonVisibility(EVisibility::Collapsed);
+	}
+
 	TSharedPtr<SPathInput> MakeContainerExtraServerResourcesPath()
 	{
 		return SNew(SPathInput)
@@ -51,7 +59,7 @@ namespace Internal
 		return SNew(SPathInput)
 			.Title(Menu::DeployManagedEC2::kOutConfigFilePathTitle)
 			.PathHint(Menu::DeployManagedEC2::kOutConfigFilePathHint)
-			.ButtonVisibility(EVisibility::Collapsed);
+			.IsFileSelection(false);
 	}
 } // namespace Internal
 
@@ -62,6 +70,7 @@ void SContainerDeploymentFields::Construct(const FArguments& InArgs)
 	ContainerGroupDefinitionNameInput = Internal::MakeContainerGroupDefinitionName();
 	ContainerImageNameInput = Internal::MakeContainerImageName();
 	ContainerImageURIInput = Internal::MakeContainerImageURI();
+	IntraContainerLaunchPathInput = Internal::MakeIntraContainerLaunchPath();
 	ExtraServerResourcesPathInput = Internal::MakeContainerExtraServerResourcesPath();
 	OutConfigFilePathInput = Internal::MakeContainerOutConfigFilePath();
 
@@ -94,6 +103,10 @@ void SContainerDeploymentFields::Construct(const FArguments& InArgs)
 	TSharedPtr<SWidget> ContainerImageURIInputRow = SNew(SNamedRow)
 		.NameText(Menu::DeployContainers::kContainerImageURITitle)
 		.RowWidget(ContainerImageURIInput);
+	
+	TSharedPtr<SWidget> IntraContainerLaunchPathInputRow = SNew(SNamedRow)
+		.NameText(Menu::DeployContainers::kIntraContainerLaunchPathTitle)
+		.RowWidget(IntraContainerLaunchPathInput);
 
 	TSharedPtr<SWidget> ExtraServerResourcesPathInputRow = SNew(SNamedRow)
 		.NameText(Menu::DeployManagedEC2::kExtraServerResourcesPathTitle)
@@ -131,6 +144,10 @@ void SContainerDeploymentFields::Construct(const FArguments& InArgs)
 		]
 		+ SVerticalBox::Slot().AutoHeight().Padding(SPadding::Top_Bottom)
 		[
+			IntraContainerLaunchPathInputRow.ToSharedRef()
+		]
+		+ SVerticalBox::Slot().AutoHeight().Padding(SPadding::Top_Bottom)
+		[
 			ExtraServerResourcesPathInputRow.ToSharedRef()
 		]
 		+ SVerticalBox::Slot().AutoHeight().Padding(SPadding::Top)
@@ -162,6 +179,11 @@ void SContainerDeploymentFields::SetContainerImageURI(const FText& Path)
 	ContainerImageURIInput->SetSelectedPath(Path);
 }
 
+void SContainerDeploymentFields::SetIntraContainerLaunchPath(const FText& Path)
+{
+	IntraContainerLaunchPathInput->SetSelectedPath(Path);
+}
+
 void SContainerDeploymentFields::SetExtraServerResourcesPath(const FText& Path)
 {
 	ExtraServerResourcesPathInput->SetSelectedPath(Path);
@@ -185,6 +207,11 @@ const FText& SContainerDeploymentFields::GetContainerImageName() const
 const FText& SContainerDeploymentFields::GetContainerImageURI() const
 {
 	return ContainerImageURIInput->GetSelectedPathRef();
+}
+
+const FText& SContainerDeploymentFields::GetIntraContainerLaunchPath() const
+{
+	return IntraContainerLaunchPathInput->GetSelectedPathRef();
 }
 
 const FText& SContainerDeploymentFields::GetExtraServerResourcesPath() const

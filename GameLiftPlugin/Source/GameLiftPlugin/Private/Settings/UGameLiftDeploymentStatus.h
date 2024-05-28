@@ -43,6 +43,8 @@ public:
 	UPROPERTY(config, EditAnywhere, Category = "Deployment Status")
 	FText ContainerImageURI;
 	UPROPERTY(config, EditAnywhere, Category = "Deployment Status")
+	FText IntraContainerLaunchPath;
+	UPROPERTY(config, EditAnywhere, Category = "Deployment Status")
 	FText ContainerExtraServerResourcesPath;
 	UPROPERTY(config, EditAnywhere, Category = "Deployment Status")
 	FText ContainerOutConfigFilePath;

@@ -215,142 +215,143 @@ bool AWSScenariosDeployer::DeployCustomScenario(
 }
 
 bool AWSScenariosDeployer::DeployContainerScenario(const FText& Scenario, IAWSAccountInstance* AwsAccountInstance,
-	const FString& ContainerGroupDefinitionName, const FString& ContainerImageName,
-	const FString& ContainerImageUri, const FString& GameName, const FString& OutConfigFilePath)
+                                                   const FString& ContainerGroupDefinitionName, const FString& ContainerImageName,
+                                                   const FString& ContainerImageUri, const FString& IntraContainerLaunchPath, const FString& GameName, const FString& OutConfigFilePath)
 {
-	return false;
-	// AwsScenarios::IAWSScenario* AwsScenario = AwsDeployerInternal::GetAwsScenarioByName(Scenario, IAWSScenariosCategory::Containers);
-	// AwsScenarios::ScenarioWithContainerParameters* ContainerScenario
-	// 	= dynamic_cast<AwsScenarios::ScenarioWithContainerParameters*>(AwsScenario);
-	//
-	// constexpr auto DeployAbortResult = false;
-	// constexpr auto DeployCompletedResult = true;
-	//
-	// AwsDeployerInternal::sLatestDeploymentLogErrorMessage.Clear();
-	//
-	// ShouldBeStopped = false;
-	//
-	// auto AccountHandle = AwsAccountInstance->GetInstance();
-	//
-	// if (AccountHandle == nullptr)
-	// {
-	// 	AwsDeployerInternal::sLatestDeploymentLogErrorMessage.Set(Deploy::Errors::kAccountIsInvalidText);
-	// 	LastAwsError = GameLift::GAMELIFT_ERROR_GENERAL;
-	// 	UE_LOG(GameLiftCoreLog, Error, TEXT("%s"), Deploy::Logs::kAccountInstanceIsNull);
-	// 	return DeployAbortResult;
-	// }
-	//
-	// if (GameName.Len() > Deploy::kMaxGameNameLength)
-	// {
-	// 	AwsDeployerInternal::sLatestDeploymentLogErrorMessage.Set(Deploy::Errors::kGameNameIsTooLongText);
-	// 	LastAwsError = GameLift::GAMELIFT_ERROR_GENERAL;
-	// 	return DeployAbortResult;
-	// }
-	//
-	// auto StdGameName = Convertors::FSToStdS(GameName);
-	// GameLiftAccountSetGameName(AccountHandle, StdGameName.c_str());
-	//
-	// auto ScenarioPath = AwsScenario->GetScenarioPath();
-	// auto StdScenarioPath = Convertors::FSToStdS(ScenarioPath);
-	// GameLiftAccountSetPluginRootPath(AccountHandle, StdScenarioPath.c_str());
-	//
-	// auto ScenarioInstancePath = AwsScenario->GetScenarioInstancePath();
-	// auto StdScenarioInstancePath = Convertors::FSToStdS(ScenarioInstancePath);
-	// GameLiftAccountSetRootPath(AccountHandle, StdScenarioInstancePath.c_str());
-	//
-	// std::string StdAwsAccountId = GameLiftGetAwsAccountIdByAccountInstance(AccountHandle);
-	//
-	// if (ShouldBeStopped)
-	// {
-	// 	LastAwsError = GameLift::GAMELIFT_ERROR_GENERAL;
-	// 	UE_LOG(GameLiftCoreLog, Error, TEXT("%s"), Deploy::Logs::kDeploymentHasBeenStopped);
-	// 	return DeployAbortResult;
-	// }
-	//
-	// auto ShouldDeployBeAborted = [this](int ErrorCode, auto&& ErrorDebugString)
-	// {
-	// 	LastAwsError = ErrorCode;
-	//
-	// 	if (LastAwsError != GameLift::GAMELIFT_SUCCESS)
-	// 	{
-	// 		UE_LOG(GameLiftCoreLog, Error, TEXT("%s %s"), ErrorDebugString, *GameLiftErrorAsString::Convert(LastAwsError));
-	// 		return true;
-	// 	}
-	//
-	// 	if (ShouldBeStopped)
-	// 	{
-	// 		LastAwsError = GameLift::GAMELIFT_ERROR_GENERAL;
-	// 		UE_LOG(GameLiftCoreLog, Error, TEXT("%s"), Deploy::Logs::kDeploymentHasBeenStopped);
-	// 		return true;
-	// 	}
-	//
-	// 	return false;
-	// };
-	//
-	// if (ShouldDeployBeAborted(GameLiftAccountCreateAndSetFunctionsReplacementId(AccountHandle), Deploy::Logs::kCreateAndSetFunctionsReplacementIdFailed))
-	// {
-	// 	return DeployAbortResult;
-	// }
-	//
-	// if (ShouldDeployBeAborted(GameLiftAccountGetMainFunctionsReplacementId(AccountHandle, this, AwsDeployerInternal::ReceiveReplacementId),
-	// 	Deploy::Logs::kGetMainFunctionsReplacementIdFailed))
-	// {
-	// 	return DeployAbortResult;
-	// }
-	//
-	// auto StdBootstrapBucketName = Convertors::FSToStdS(AwsAccountInstance->GetBucketName());
-	//
-	// AwsScenarios::ContainerInstanceTemplateParams Params;
-	// Params.AccountId = StdAwsAccountId;
-	// Params.ApiGatewayStageNameParameter = AwsAccountInstance->GetBuildConfiguration();
-	// Params.GameNameParameter = Convertors::FSToStdS(AwsAccountInstance->GetGameName());
-	// Params.ContainerGroupDefinitionNameParameter = Convertors::FSToStdS(ContainerGroupDefinitionName);
-	// Params.ContainerImageNameParameter = Convertors::FSToStdS(ContainerImageName);
-	// Params.ContainerImageUriParameter = Convertors::FSToStdS(ContainerImageUri);
-	// Params.LambdaZipS3BucketParameter = StdBootstrapBucketName;
-	// Params.LambdaZipS3KeyParameter = AwsScenarios::GetLambdaS3Key(StdGameName, MainFunctionsReplacementId);
-	//
-	// if (ShouldDeployBeAborted(
-	// 	ContainerScenario->SaveFeatureInstanceTemplateContainers(AwsAccountInstance, Params),
-	// 	Deploy::Logs::kSaveFeatureInstanceTemplatesFailed))
-	// {
-	// 	return DeployAbortResult;
-	// }
-	//
-	// if (ShouldDeployBeAborted(
-	// 	GameLiftAccountUploadFunctions(AccountHandle),
-	// 	Deploy::Logs::kAccountUploadFunctionsFailed))
-	// {
-	// 	return DeployAbortResult;
-	// }
-	//
-	// if (ShouldDeployBeAborted(
-	// 	GameLiftAccountCreateOrUpdateMainStack(AccountHandle),
-	// 	Deploy::Logs::kCreateOrUpdateMainStackFailed))
-	// {
-	// 	return DeployAbortResult;
-	// }
-	//
-	// if (ShouldDeployBeAborted(
-	// 	GameLiftAccountDeployApiGatewayStage(AccountHandle),
-	// 	Deploy::Logs::kDeployApiGatewayStageFailed))
-	// {
-	// 	return DeployAbortResult;
-	// }
-	//
-	// if (ShouldDeployBeAborted(
-	// 	UpdateDeploymentResults(
-	// 		AwsAccountInstance,
-	// 		ScenarioInstancePath,
-	// 		GameName,
-	// 		AwsAccountInstance->GetBucketName(),
-	// 		OutConfigFilePath), 
-	// 	Deploy::Logs::kDeploymentStackStatusFailed))
-	// {
-	// 	return DeployAbortResult;
-	// }
-	//
-	// return DeployCompletedResult;
+	constexpr auto DeployAbortResult = false;
+	constexpr auto DeployCompletedResult = true;
+	
+	AwsScenarios::IAWSScenario* AwsScenario = AwsDeployerInternal::GetAwsScenarioByName(Scenario, IAWSScenariosCategory::Containers);
+	AwsScenarios::ScenarioWithContainerParameters& ContainerScenario
+		= static_cast<AwsScenarios::ScenarioWithContainerParameters&>(*AwsScenario);
+	// TODO STEFAN: KILL this HORRIBLE UNSAFE CAST and use overloaded function
+	
+	AwsDeployerInternal::sLatestDeploymentLogErrorMessage.Clear();
+	
+	ShouldBeStopped = false;
+	
+	auto AccountHandle = AwsAccountInstance->GetInstance();
+	
+	if (AccountHandle == nullptr)
+	{
+		AwsDeployerInternal::sLatestDeploymentLogErrorMessage.Set(Deploy::Errors::kAccountIsInvalidText);
+		LastAwsError = GameLift::GAMELIFT_ERROR_GENERAL;
+		UE_LOG(GameLiftCoreLog, Error, TEXT("%s"), Deploy::Logs::kAccountInstanceIsNull);
+		return DeployAbortResult;
+	}
+	
+	if (GameName.Len() > Deploy::kMaxGameNameLength)
+	{
+		AwsDeployerInternal::sLatestDeploymentLogErrorMessage.Set(Deploy::Errors::kGameNameIsTooLongText);
+		LastAwsError = GameLift::GAMELIFT_ERROR_GENERAL;
+		return DeployAbortResult;
+	}
+	
+	auto StdGameName = Convertors::FSToStdS(GameName);
+	GameLiftAccountSetGameName(AccountHandle, StdGameName.c_str());
+	
+	auto ScenarioPath = AwsScenario->GetScenarioPath();
+	auto StdScenarioPath = Convertors::FSToStdS(ScenarioPath);
+	GameLiftAccountSetPluginRootPath(AccountHandle, StdScenarioPath.c_str());
+	
+	auto ScenarioInstancePath = AwsScenario->GetScenarioInstancePath();
+	auto StdScenarioInstancePath = Convertors::FSToStdS(ScenarioInstancePath);
+	GameLiftAccountSetRootPath(AccountHandle, StdScenarioInstancePath.c_str());
+	
+	std::string StdAwsAccountId = GameLiftGetAwsAccountIdByAccountInstance(AccountHandle);
+	
+	if (ShouldBeStopped)
+	{
+		LastAwsError = GameLift::GAMELIFT_ERROR_GENERAL;
+		UE_LOG(GameLiftCoreLog, Error, TEXT("%s"), Deploy::Logs::kDeploymentHasBeenStopped);
+		return DeployAbortResult;
+	}
+	
+	auto ShouldDeployBeAborted = [this](int ErrorCode, auto&& ErrorDebugString)
+	{
+		LastAwsError = ErrorCode;
+	
+		if (LastAwsError != GameLift::GAMELIFT_SUCCESS)
+		{
+			UE_LOG(GameLiftCoreLog, Error, TEXT("%s %s"), ErrorDebugString, *GameLiftErrorAsString::Convert(LastAwsError));
+			return true;
+		}
+	
+		if (ShouldBeStopped)
+		{
+			LastAwsError = GameLift::GAMELIFT_ERROR_GENERAL;
+			UE_LOG(GameLiftCoreLog, Error, TEXT("%s"), Deploy::Logs::kDeploymentHasBeenStopped);
+			return true;
+		}
+	
+		return false;
+	};
+	
+	if (ShouldDeployBeAborted(GameLiftAccountCreateAndSetFunctionsReplacementId(AccountHandle), Deploy::Logs::kCreateAndSetFunctionsReplacementIdFailed))
+	{
+		return DeployAbortResult;
+	}
+	
+	if (ShouldDeployBeAborted(GameLiftAccountGetMainFunctionsReplacementId(AccountHandle, this, AwsDeployerInternal::ReceiveReplacementId),
+		Deploy::Logs::kGetMainFunctionsReplacementIdFailed))
+	{
+		return DeployAbortResult;
+	}
+	
+	auto StdBootstrapBucketName = Convertors::FSToStdS(AwsAccountInstance->GetBucketName());
+	
+	AwsScenarios::ContainerInstanceTemplateParams Params;
+	Params.AccountId = StdAwsAccountId;
+	Params.ApiGatewayStageNameParameter = AwsAccountInstance->GetBuildConfiguration();
+	Params.GameNameParameter = Convertors::FSToStdS(AwsAccountInstance->GetGameName());
+	Params.ContainerGroupDefinitionNameParameter = Convertors::FSToStdS(ContainerGroupDefinitionName);
+	Params.ContainerImageNameParameter = Convertors::FSToStdS(ContainerImageName);
+	Params.ContainerImageUriParameter = Convertors::FSToStdS(ContainerImageUri);
+	Params.LambdaZipS3BucketParameter = StdBootstrapBucketName;
+	Params.LambdaZipS3KeyParameter = AwsScenarios::GetLambdaS3Key(StdGameName, MainFunctionsReplacementId);
+	Params.LaunchPathParameter = Convertors::FSToStdS(IntraContainerLaunchPath);
+	
+	if (ShouldDeployBeAborted(
+		ContainerScenario.SaveFeatureInstanceTemplateContainers(AwsAccountInstance, Params), 	// TODO STEFAN: KILL this HORRIBLE UNSAFE CAST and use overloaded function
+		Deploy::Logs::kSaveFeatureInstanceTemplatesFailed))
+	{
+		return DeployAbortResult;
+	}
+	
+	if (ShouldDeployBeAborted(
+		GameLiftAccountUploadFunctions(AccountHandle),
+		Deploy::Logs::kAccountUploadFunctionsFailed))
+	{
+		return DeployAbortResult;
+	}
+	
+	if (ShouldDeployBeAborted(
+		GameLiftAccountCreateOrUpdateMainStack(AccountHandle),
+		Deploy::Logs::kCreateOrUpdateMainStackFailed))
+	{
+		return DeployAbortResult;
+	}
+	
+	if (ShouldDeployBeAborted(
+		GameLiftAccountDeployApiGatewayStage(AccountHandle),
+		Deploy::Logs::kDeployApiGatewayStageFailed))
+	{
+		return DeployAbortResult;
+	}
+	
+	if (ShouldDeployBeAborted(
+		UpdateDeploymentResults(
+			AwsAccountInstance,
+			ScenarioInstancePath,
+			GameName,
+			AwsAccountInstance->GetBucketName(),
+			OutConfigFilePath), 
+		Deploy::Logs::kDeploymentStackStatusFailed))
+	{
+		return DeployAbortResult;
+	}
+	
+	return DeployCompletedResult;
 }
 
 bool AWSScenariosDeployer::StopDeployment(IAWSAccountInstance* AwsAccountInstance)
@@ -477,18 +478,19 @@ bool AWSScenariosDeployer::DeployScenarioImpl(
 	auto StdBuildFolderPath = Convertors::FSToStdS(BuildFolderPath);
 	auto StdExtraServerResourcesPath = Convertors::FSToStdS(ExtraServerResourcesPath);
 
-	// if (ShouldDeployBeAborted(AwsScenario->UploadGameServer(AwsAccountInstance, StdBuildFolderPath.c_str(), StdExtraServerResourcesPath.c_str()),
-	// 	Deploy::Logs::kUploadGameServerFailed))
-	// {
-	// 	return DeployAbortResult;
-	// }
-	//
+	if (ShouldDeployBeAborted(AwsScenario->UploadGameServer(AwsAccountInstance, StdBuildFolderPath.c_str(), StdExtraServerResourcesPath.c_str()),
+		Deploy::Logs::kUploadGameServerFailed))
+	{
+		return DeployAbortResult;
+	}
+	
 	std::string StdLaunchPathParameter;
 	if (ShouldDeployBeAborted(AwsScenario->CreateLaunchPathParameter(BuildOperatingSystem, BuildFolderPath, BuildFilePath, StdLaunchPathParameter),
 		Deploy::Logs::kCreateLaunchPathParameterFailed))
 	{
 		return DeployAbortResult;
 	}
+
 
 	AwsScenarios::InstanceTemplateParams Params;
 	Params.GameNameParameter = Convertors::FSToStdS(AwsAccountInstance->GetGameName());

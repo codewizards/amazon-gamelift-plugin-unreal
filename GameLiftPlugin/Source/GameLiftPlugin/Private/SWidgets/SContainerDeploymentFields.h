@@ -29,12 +29,14 @@ public:
 	void SetContainerGroupDefinitionName(const FText& Name);
 	void SetContainerImageName(const FText& Name);
 	void SetContainerImageURI(const FText& Path);
+	void SetIntraContainerLaunchPath(const FText& Path);
 	void SetExtraServerResourcesPath(const FText& Path);
 	void SetOutConfigFilePath(const FText& Path);
 
 	const FText& GetContainerGroupDefinitionName() const;
 	const FText& GetContainerImageName() const;
 	const FText& GetContainerImageURI() const;
+	const FText& GetIntraContainerLaunchPath() const;
 	const FText& GetExtraServerResourcesPath() const;
 	const FText& GetOutConfigFilePath() const;
 
@@ -42,6 +44,7 @@ private:
 	TSharedPtr<SPathInput> ContainerGroupDefinitionNameInput;
 	TSharedPtr<SPathInput> ContainerImageNameInput;
 	TSharedPtr<SPathInput> ContainerImageURIInput;
+	TSharedPtr<SPathInput> IntraContainerLaunchPathInput;
 	TSharedPtr<SPathInput> ExtraServerResourcesPathInput;
 	TSharedPtr<SPathInput> OutConfigFilePathInput;
 };
