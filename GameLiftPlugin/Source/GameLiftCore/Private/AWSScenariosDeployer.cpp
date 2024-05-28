@@ -222,9 +222,6 @@ bool AWSScenariosDeployer::DeployContainerScenario(const FText& Scenario, IAWSAc
 	constexpr auto DeployCompletedResult = true;
 	
 	AwsScenarios::IAWSScenario* AwsScenario = AwsDeployerInternal::GetAwsScenarioByName(Scenario, IAWSScenariosCategory::Containers);
-	AwsScenarios::ScenarioWithContainerParameters& ContainerScenario
-		= static_cast<AwsScenarios::ScenarioWithContainerParameters&>(*AwsScenario);
-	// TODO STEFAN: KILL this HORRIBLE UNSAFE CAST and use overloaded function
 	
 	AwsDeployerInternal::sLatestDeploymentLogErrorMessage.Clear();
 	
@@ -312,7 +309,7 @@ bool AWSScenariosDeployer::DeployContainerScenario(const FText& Scenario, IAWSAc
 	Params.LaunchPathParameter = Convertors::FSToStdS(IntraContainerLaunchPath);
 	
 	if (ShouldDeployBeAborted(
-		ContainerScenario.SaveFeatureInstanceTemplateContainers(AwsAccountInstance, Params), 	// TODO STEFAN: KILL this HORRIBLE UNSAFE CAST and use overloaded function
+		AwsScenario->SaveFeatureInstanceTemplate(AwsAccountInstance, Params.ToMap()), 
 		Deploy::Logs::kSaveFeatureInstanceTemplatesFailed))
 	{
 		return DeployAbortResult;
@@ -492,7 +489,7 @@ bool AWSScenariosDeployer::DeployScenarioImpl(
 	}
 
 
-	AwsScenarios::InstanceTemplateParams Params;
+	AwsScenarios::ManagedEC2InstanceTemplateParams Params;
 	Params.GameNameParameter = Convertors::FSToStdS(AwsAccountInstance->GetGameName());
 	Params.BuildOperatingSystemParameter = StdBuildOperatingSystemParameter;
 	Params.BuildS3BucketParameter = StdBootstrapBucketName;
@@ -502,7 +499,7 @@ bool AWSScenariosDeployer::DeployScenarioImpl(
 	Params.AccountId = StdAwsAccountId;
 	Params.LaunchPathParameter = StdLaunchPathParameter;
 
-	if (ShouldDeployBeAborted(AwsScenario->SaveFeatureInstanceTemplate(AwsAccountInstance, Params),
+	if (ShouldDeployBeAborted(AwsScenario->SaveFeatureInstanceTemplate(AwsAccountInstance, Params.ToMap()),
 		Deploy::Logs::kSaveFeatureInstanceTemplatesFailed))
 	{
 		return DeployAbortResult;
