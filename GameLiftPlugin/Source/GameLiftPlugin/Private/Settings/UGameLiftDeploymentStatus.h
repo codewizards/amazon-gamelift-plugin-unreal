@@ -48,6 +48,8 @@ public:
 	FText ContainerExtraServerResourcesPath;
 	UPROPERTY(config, EditAnywhere, Category = "Deployment Status")
 	FText ContainerOutConfigFilePath;
+	UPROPERTY(config, EditAnywhere, Category = "Deployment Status")
+	FText GameName;
 
 	UPROPERTY(config, EditAnywhere, Category = "Deployment Status")
 	FDateTime LastUpdated;

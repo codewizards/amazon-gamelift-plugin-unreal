@@ -14,19 +14,11 @@
 
 namespace Internal
 {
-	TSharedPtr<SPathInput> MakeContainerGroupDefinitionName()
+	TSharedPtr<SPathInput> MakeGameName()
 	{
 		return SNew(SPathInput)
-			.Title(Menu::DeployContainers::kContainerGroupDefinitionNameText)
-			.PathHint(Menu::DeployContainers::kContainerGroupDefinitionNameHint)
-			.ButtonVisibility(EVisibility::Collapsed);
-	}
-	
-	TSharedPtr<SPathInput> MakeContainerImageName()
-	{
-		return SNew(SPathInput)
-			.Title(Menu::DeployContainers::kContainerImageNameText)
-			.PathHint(Menu::DeployContainers::kContainerImageNameHint)
+			.Title(Menu::DeployContainers::kGameNameText)
+			.PathHint(Menu::DeployContainers::kGameNameHint)
 			.ButtonVisibility(EVisibility::Collapsed);
 	}
 
@@ -67,38 +59,24 @@ namespace Internal
 
 void SContainerDeploymentFields::Construct(const FArguments& InArgs)
 {
-	ContainerGroupDefinitionNameInput = Internal::MakeContainerGroupDefinitionName();
-	ContainerImageNameInput = Internal::MakeContainerImageName();
+	GameNameInput = Internal::MakeGameName();
 	ContainerImageURIInput = Internal::MakeContainerImageURI();
 	IntraContainerLaunchPathInput = Internal::MakeIntraContainerLaunchPath();
 	ExtraServerResourcesPathInput = Internal::MakeContainerExtraServerResourcesPath();
 	OutConfigFilePathInput = Internal::MakeContainerOutConfigFilePath();
 
-	TSharedPtr<SWidget> ContainerGroupDefinitionNameInputRow = SNew(SNamedRow)
-		.NameText(Menu::DeployContainers::kContainerGroupDefinitionNameTitle)
-		.RowWidget(ContainerGroupDefinitionNameInput);
+	TSharedPtr<SWidget> GameNameInputRow = SNew(SNamedRow)
+		.NameText(Menu::DeployContainers::kGameNameTitle)
+		.RowWidget(GameNameInput);
 
-	TSharedPtr<SWidget> ContainerGroupDefinitionNameInstructionsRow = SNew(SNamedRow)
+	TSharedPtr<SWidget> GameNameInstructionsRow = SNew(SNamedRow)
 		.SecondaryColumnLeftPadding(true)
 		.RowWidget(
 			SNew(STextBlock)
-			.Text(Menu::DeployContainers::kContainerGroupDefinitionNameInstructionText)
+			.Text(Menu::DeployContainers::kGameNameInstructionText)
 			.TextStyle(FGameLiftPluginStyle::Get(), Style::Text::kNote)
 			.AutoWrapText(true)
 			);
-
-	TSharedPtr<SWidget> ContainerImageNameInputRow = SNew(SNamedRow)
-		.NameText(Menu::DeployContainers::kContainerImageNameTitle)
-		.RowWidget(ContainerImageNameInput);
-
-	TSharedPtr<SWidget> ContainerImageNameInstructionsRow = SNew(SNamedRow)
-		.SecondaryColumnLeftPadding(true)
-		.RowWidget(
-			SNew(STextBlock)
-			.Text(Menu::DeployContainers::kContainerImageNameInstructionText)
-			.TextStyle(FGameLiftPluginStyle::Get(), Style::Text::kNote)
-			.AutoWrapText(true)
-		);
 	
 	TSharedPtr<SWidget> ContainerImageURIInputRow = SNew(SNamedRow)
 		.NameText(Menu::DeployContainers::kContainerImageURITitle)
@@ -124,19 +102,11 @@ void SContainerDeploymentFields::Construct(const FArguments& InArgs)
 		SNew(SVerticalBox)
 		+ SVerticalBox::Slot().AutoHeight()
 		[
-			ContainerGroupDefinitionNameInputRow.ToSharedRef()
+			GameNameInputRow.ToSharedRef()
 		]
 		+ SVerticalBox::Slot().AutoHeight()
 		[
-			ContainerGroupDefinitionNameInstructionsRow.ToSharedRef()
-		]
-		+ SVerticalBox::Slot().AutoHeight()
-		[
-			ContainerImageNameInputRow.ToSharedRef()
-		]
-		+ SVerticalBox::Slot().AutoHeight()
-		[
-			ContainerImageNameInstructionsRow.ToSharedRef()
+			GameNameInstructionsRow.ToSharedRef()
 		]
 		+ SVerticalBox::Slot().AutoHeight().Padding(SPadding::Top_Bottom)
 		[
@@ -164,14 +134,9 @@ void SContainerDeploymentFields::Construct(const FArguments& InArgs)
 	];
 }
 
-void SContainerDeploymentFields::SetContainerGroupDefinitionName(const FText& Name)
+void SContainerDeploymentFields::SetGameName(const FText& Name)
 {
-	ContainerGroupDefinitionNameInput->SetSelectedPath(Name);
-}
-
-void SContainerDeploymentFields::SetContainerImageName(const FText& Name)
-{
-	ContainerImageNameInput->SetSelectedPath(Name);
+	GameNameInput->SetSelectedPath(Name);
 }
 
 void SContainerDeploymentFields::SetContainerImageURI(const FText& Path)
@@ -194,14 +159,9 @@ void SContainerDeploymentFields::SetOutConfigFilePath(const FText& Path)
 	OutConfigFilePathInput->SetSelectedPath(Path);
 }
 
-const FText& SContainerDeploymentFields::GetContainerGroupDefinitionName() const
+const FText& SContainerDeploymentFields::GetGameName() const
 {
-	return ContainerGroupDefinitionNameInput->GetSelectedPathRef();
-}
-
-const FText& SContainerDeploymentFields::GetContainerImageName() const
-{
-	return ContainerImageNameInput->GetSelectedPathRef();
+	return GameNameInput->GetSelectedPathRef();
 }
 
 const FText& SContainerDeploymentFields::GetContainerImageURI() const

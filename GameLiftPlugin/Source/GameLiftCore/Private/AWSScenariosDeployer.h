@@ -58,7 +58,7 @@ private:
 
 	bool DeployScenarioImpl(
 		IAWSAccountInstance* AccountInstance,
-		AwsScenarios::IAWSScenario* AwsScenario, const AwsScenarios::BaseInstanceTemplateParams& Params, const FString&
+		AwsScenarios::IAWSScenario* AwsScenario, AwsScenarios::BaseInstanceTemplateParams& Params, const FString&
 		OutConfigFilePath
 	);
 	int UpdateDeploymentResults(

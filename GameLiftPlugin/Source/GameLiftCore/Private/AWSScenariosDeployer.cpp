@@ -195,7 +195,6 @@ bool AWSScenariosDeployer::DeployScenario(
 
 	AwsScenarios::IAWSScenario* AwsScenario = AwsDeployerInternal::GetAwsScenarioByName(Scenario, IAWSScenariosCategory::ManagedEC2);
 
-	auto StdBootstrapBucketName = Convertors::FSToStdS(AwsAccountInstance->GetBucketName());
 	std::string stdLaunchPathParameter;
 	AwsScenario->CreateLaunchPathParameter(BuildOperatingSystem, BuildFolderPath, BuildFilePath, stdLaunchPathParameter);
 	
@@ -206,11 +205,6 @@ bool AWSScenariosDeployer::DeployScenario(
 	Params.ExtraServerResourcesPath = Convertors::FSToStdS(ExtraServerResourcesPath);
 	
 	Params.BuildOperatingSystemParameter = Convertors::FSToStdS(BuildOperatingSystem);
-	Params.BuildS3BucketParameter = StdBootstrapBucketName;
-	Params.LambdaZipS3BucketParameter = StdBootstrapBucketName;
-	Params.LambdaZipS3KeyParameter = AwsScenarios::GetLambdaS3Key(Convertors::FSToStdS(GameName), MainFunctionsReplacementId);
-	Params.ApiGatewayStageNameParameter = AwsAccountInstance->GetBuildConfiguration();
-	Params.AccountId = GameLiftGetAwsAccountIdByAccountInstance(AwsAccountInstance->GetInstance());
 	Params.LaunchPathParameter = stdLaunchPathParameter;
 	
 	return DeployScenarioImpl(AwsAccountInstance, AwsScenario, Params, OutConfigFilePath);
@@ -230,8 +224,7 @@ bool AWSScenariosDeployer::DeployCustomScenario(
 	UE_LOG(GameLiftCoreLog, Log, TEXT("%s %s"), Deploy::Logs::kRunCustomScenario, *CustomScenarioPath);
 
 	TUniquePtr<AwsScenarios::IAWSScenario> AwsScenario = AwsScenarios::CustomScenario::Create(CustomScenarioPath);
-
-	auto StdBootstrapBucketName = Convertors::FSToStdS(AwsAccountInstance->GetBucketName());
+	
 	std::string stdLaunchPathParameter;
 	AwsScenario->CreateLaunchPathParameter(BuildOperatingSystem, BuildFolderPath, BuildFilePath, stdLaunchPathParameter);
 	
@@ -242,21 +235,19 @@ bool AWSScenariosDeployer::DeployCustomScenario(
 	Params.ExtraServerResourcesPath = Convertors::FSToStdS(ExtraServerResourcesPath);
 	
 	Params.BuildOperatingSystemParameter = Convertors::FSToStdS(BuildOperatingSystem);
-	Params.BuildS3BucketParameter = StdBootstrapBucketName;
-	Params.LambdaZipS3BucketParameter = StdBootstrapBucketName;
-	Params.LambdaZipS3KeyParameter = AwsScenarios::GetLambdaS3Key(Convertors::FSToStdS(GameName), MainFunctionsReplacementId);
-	Params.ApiGatewayStageNameParameter = AwsAccountInstance->GetBuildConfiguration();
-	Params.AccountId = GameLiftGetAwsAccountIdByAccountInstance(AwsAccountInstance->GetInstance());
 	Params.LaunchPathParameter = stdLaunchPathParameter;
 	
 	return DeployScenarioImpl(AwsAccountInstance, AwsScenario.Get(), Params, OutConfigFilePath);
 }
 
-bool AWSScenariosDeployer::DeployContainerScenario(const FText& Scenario, IAWSAccountInstance* AwsAccountInstance,
-                                                   const FString& ContainerGroupDefinitionName, const FString& ContainerImageName,
-                                                   const FString& ContainerImageUri, const FString& IntraContainerLaunchPath, const FString& GameName, const FString& OutConfigFilePath)
+bool AWSScenariosDeployer::DeployContainerScenario(
+	const FText& Scenario, IAWSAccountInstance* AwsAccountInstance,const FString& ContainerGroupDefinitionName,
+	const FString& ContainerImageName,const FString& ContainerImageUri, const FString& IntraContainerLaunchPath,
+	const FString& GameName, const FString& OutConfigFilePath)
 {
-	AwsScenarios::IAWSScenario* AwsScenario = AwsDeployerInternal::GetAwsScenarioByName(Scenario, IAWSScenariosCategory::Containers);
+	AwsScenarios::IAWSScenario* AwsScenario = AwsDeployerInternal::GetAwsScenarioByName(
+		Scenario, 
+		IAWSScenariosCategory::Containers);
 	
 	auto StdBootstrapBucketName = Convertors::FSToStdS(AwsAccountInstance->GetBucketName());
 	
@@ -264,13 +255,9 @@ bool AWSScenariosDeployer::DeployContainerScenario(const FText& Scenario, IAWSAc
 	
 	Params.GameNameParameter = Convertors::FSToStdS(GameName);
 	
-	Params.AccountId = GameLiftGetAwsAccountIdByAccountInstance(AwsAccountInstance->GetInstance());
-	Params.ApiGatewayStageNameParameter = AwsAccountInstance->GetBuildConfiguration();
 	Params.ContainerGroupDefinitionNameParameter = Convertors::FSToStdS(ContainerGroupDefinitionName);
 	Params.ContainerImageNameParameter = Convertors::FSToStdS(ContainerImageName);
 	Params.ContainerImageUriParameter = Convertors::FSToStdS(ContainerImageUri);
-	Params.LambdaZipS3BucketParameter = StdBootstrapBucketName;
-	Params.LambdaZipS3KeyParameter = AwsScenarios::GetLambdaS3Key(Convertors::FSToStdS(GameName), MainFunctionsReplacementId);
 	Params.LaunchPathParameter = Convertors::FSToStdS(IntraContainerLaunchPath);
 	
 	return DeployScenarioImpl(AwsAccountInstance, AwsScenario, Params, OutConfigFilePath);
@@ -311,7 +298,8 @@ bool AWSScenariosDeployer::StopDeployment(IAWSAccountInstance* AwsAccountInstanc
 bool AWSScenariosDeployer::DeployScenarioImpl(
 	IAWSAccountInstance* AwsAccountInstance,
 	AwsScenarios::IAWSScenario* AwsScenario,
-	const AwsScenarios::BaseInstanceTemplateParams& Params, const FString& OutConfigFilePath
+	AwsScenarios::BaseInstanceTemplateParams& Params,
+	const FString& OutConfigFilePath
 )
 {
 	constexpr auto DeployAbortResult = false;
@@ -388,11 +376,19 @@ bool AWSScenariosDeployer::DeployScenarioImpl(
 		return DeployAbortResult;
 	}
 
+	auto StdBootstrapBucketName = Convertors::FSToStdS(AwsAccountInstance->GetBucketName());
+	
 	if (ShouldDeployBeAborted(AwsScenario->UploadGameServer(AwsAccountInstance, Params.BuildFolderPath.c_str(), Params.ExtraServerResourcesPath.c_str()),
 		Deploy::Logs::kUploadGameServerFailed))
 	{
 		return DeployAbortResult;
 	}
+
+	Params.AccountId = StdAwsAccountId;
+	Params.ApiGatewayStageNameParameter = AwsAccountInstance->GetBuildConfiguration();
+	Params.BuildS3BucketParameter = StdBootstrapBucketName;
+	Params.LambdaZipS3BucketParameter = StdBootstrapBucketName;
+	Params.LambdaZipS3KeyParameter = AwsScenarios::GetLambdaS3Key(Params.GameNameParameter, MainFunctionsReplacementId);
 
 	if (ShouldDeployBeAborted(AwsScenario->SaveFeatureInstanceTemplate(AwsAccountInstance, Params.ToMap()),
 		Deploy::Logs::kSaveFeatureInstanceTemplatesFailed))

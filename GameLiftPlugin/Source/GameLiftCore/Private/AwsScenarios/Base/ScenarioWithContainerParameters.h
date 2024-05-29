@@ -30,12 +30,7 @@ namespace AwsScenarios
 			};
 			return paramNames;
 		}
-
-		// TODO Stefan - This should override the virtual function in IAWSScenario;
-		//				 need to change the interface to not be tightly coupled to InstanceTemplateParams.
-		//				 Probably should change InstanceTemplateParams to something generic and then can pass that
-		//				 to AWSScenariosDeployer::DeployScenario instead of having the function be tightly coupled
-		//				 to some specific set of parameters.
+		
 		virtual int SaveFeatureInstanceTemplate(IAWSAccountInstance* AwsAccountInstance,
 		                                        const TMap<FString, FString>& InParams) override
 		{
@@ -61,11 +56,11 @@ namespace AwsScenarios
 			return GameLiftAccountSaveFeatureInstanceTemplates(AwsAccountInstance->GetInstance(), ParamNames, ParamValues, Size);
 		}
 		
-		virtual int UploadGameServer(IAWSAccountInstance* AwsAccountInstance, const std::string& ServerFolderPath, const std::string& ExtraServerResourcesPath)
+		virtual int UploadGameServer(IAWSAccountInstance* AwsAccountInstance, const std::string& ServerFolderPath, const std::string& ExtraServerResourcesPath) override
 		{
 			return 0;
 		};
-		virtual int CreateLaunchPathParameter(const FString& BuildOperatingSystem, const FString& BuildFolderPath, const FString& BuildFilePath, std::string& StdLaunchPathParameter)
+		virtual int CreateLaunchPathParameter(const FString& BuildOperatingSystem, const FString& BuildFolderPath, const FString& BuildFilePath, std::string& StdLaunchPathParameter) override
 		{
 			return 0;
 		};

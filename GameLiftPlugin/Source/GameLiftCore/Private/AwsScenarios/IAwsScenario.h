@@ -24,9 +24,15 @@ namespace AwsScenarios
 
 	struct BaseInstanceTemplateParams
 	{
-		std::string GameNameParameter;
+		std::string AccountId;
+		std::string ApiGatewayStageNameParameter;
 		std::string BuildFolderPath;
+		std::string BuildS3BucketParameter;
 		std::string ExtraServerResourcesPath;
+		std::string GameNameParameter;
+		std::string LambdaZipS3BucketParameter;
+		std::string LambdaZipS3KeyParameter;
+		std::string LaunchPathParameter;
 		
 		virtual ~BaseInstanceTemplateParams() = default;
 		
@@ -37,13 +43,6 @@ namespace AwsScenarios
 	struct ManagedEC2InstanceTemplateParams : BaseInstanceTemplateParams
 	{
 		std::string BuildOperatingSystemParameter;
-		std::string BuildS3BucketParameter;
-		std::string LambdaZipS3BucketParameter;
-		std::string LambdaZipS3KeyParameter;
-		std::string ApiGatewayStageNameParameter;
-		std::string AccountId;
-		std::string LaunchPathParameter;
-		
 		ManagedEC2InstanceTemplateParams() = default;
 		
 		virtual void FromMap(const TMap<FString, FString>& InMap) override
@@ -91,15 +90,9 @@ namespace AwsScenarios
 
 	struct ContainerInstanceTemplateParams : BaseInstanceTemplateParams
 	{
-		std::string AccountId;
-		std::string ApiGatewayStageNameParameter;
 		std::string ContainerGroupDefinitionNameParameter;
 		std::string ContainerImageNameParameter;
 		std::string ContainerImageUriParameter;
-		std::string GameNameParameter;
-		std::string LambdaZipS3BucketParameter;
-		std::string LambdaZipS3KeyParameter;
-		std::string LaunchPathParameter;
 
 		ContainerInstanceTemplateParams() = default;
 
