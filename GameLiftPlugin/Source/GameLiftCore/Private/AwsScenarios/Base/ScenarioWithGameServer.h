@@ -67,9 +67,5 @@ namespace AwsScenarios
 
 			return GameLift::GAMELIFT_SUCCESS;
 		}
-		
-		FString BuildOperatingSystem;
-		FString BuildFolderPath;
-		FString BuildFilePath;
 	};
 } // namespace AwsScenarios

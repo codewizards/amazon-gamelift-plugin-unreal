@@ -194,7 +194,26 @@ bool AWSScenariosDeployer::DeployScenario(
 	UE_LOG(GameLiftCoreLog, Log, TEXT("%s %s"), Deploy::Logs::kRunAwsScenario, *Scenario.ToString());
 
 	AwsScenarios::IAWSScenario* AwsScenario = AwsDeployerInternal::GetAwsScenarioByName(Scenario, IAWSScenariosCategory::ManagedEC2);
-	return DeployScenarioImpl(AwsAccountInstance, AwsScenario, GameName, BuildOperatingSystem, BuildFolderPath, BuildFilePath, OutConfigFilePath, ExtraServerResourcesPath);
+
+	auto StdBootstrapBucketName = Convertors::FSToStdS(AwsAccountInstance->GetBucketName());
+	std::string stdLaunchPathParameter;
+	AwsScenario->CreateLaunchPathParameter(BuildOperatingSystem, BuildFolderPath, BuildFilePath, stdLaunchPathParameter);
+	
+	AwsScenarios::ManagedEC2InstanceTemplateParams Params;
+	
+	Params.GameNameParameter = Convertors::FSToStdS(GameName);
+	Params.BuildFolderPath = Convertors::FSToStdS(BuildFolderPath);
+	Params.ExtraServerResourcesPath = Convertors::FSToStdS(ExtraServerResourcesPath);
+	
+	Params.BuildOperatingSystemParameter = Convertors::FSToStdS(BuildOperatingSystem);
+	Params.BuildS3BucketParameter = StdBootstrapBucketName;
+	Params.LambdaZipS3BucketParameter = StdBootstrapBucketName;
+	Params.LambdaZipS3KeyParameter = AwsScenarios::GetLambdaS3Key(Convertors::FSToStdS(GameName), MainFunctionsReplacementId);
+	Params.ApiGatewayStageNameParameter = AwsAccountInstance->GetBuildConfiguration();
+	Params.AccountId = GameLiftGetAwsAccountIdByAccountInstance(AwsAccountInstance->GetInstance());
+	Params.LaunchPathParameter = stdLaunchPathParameter;
+	
+	return DeployScenarioImpl(AwsAccountInstance, AwsScenario, Params, OutConfigFilePath);
 }
 
 bool AWSScenariosDeployer::DeployCustomScenario(
@@ -211,144 +230,50 @@ bool AWSScenariosDeployer::DeployCustomScenario(
 	UE_LOG(GameLiftCoreLog, Log, TEXT("%s %s"), Deploy::Logs::kRunCustomScenario, *CustomScenarioPath);
 
 	TUniquePtr<AwsScenarios::IAWSScenario> AwsScenario = AwsScenarios::CustomScenario::Create(CustomScenarioPath);
-	return DeployScenarioImpl(AwsAccountInstance, AwsScenario.Get(), GameName, BuildOperatingSystem, BuildFolderPath, BuildFilePath, OutConfigFilePath, ExtraServerResourcesPath);
+
+	auto StdBootstrapBucketName = Convertors::FSToStdS(AwsAccountInstance->GetBucketName());
+	std::string stdLaunchPathParameter;
+	AwsScenario->CreateLaunchPathParameter(BuildOperatingSystem, BuildFolderPath, BuildFilePath, stdLaunchPathParameter);
+	
+	AwsScenarios::ManagedEC2InstanceTemplateParams Params;
+	
+	Params.GameNameParameter = Convertors::FSToStdS(GameName);
+	Params.BuildFolderPath = Convertors::FSToStdS(BuildFolderPath);
+	Params.ExtraServerResourcesPath = Convertors::FSToStdS(ExtraServerResourcesPath);
+	
+	Params.BuildOperatingSystemParameter = Convertors::FSToStdS(BuildOperatingSystem);
+	Params.BuildS3BucketParameter = StdBootstrapBucketName;
+	Params.LambdaZipS3BucketParameter = StdBootstrapBucketName;
+	Params.LambdaZipS3KeyParameter = AwsScenarios::GetLambdaS3Key(Convertors::FSToStdS(GameName), MainFunctionsReplacementId);
+	Params.ApiGatewayStageNameParameter = AwsAccountInstance->GetBuildConfiguration();
+	Params.AccountId = GameLiftGetAwsAccountIdByAccountInstance(AwsAccountInstance->GetInstance());
+	Params.LaunchPathParameter = stdLaunchPathParameter;
+	
+	return DeployScenarioImpl(AwsAccountInstance, AwsScenario.Get(), Params, OutConfigFilePath);
 }
 
 bool AWSScenariosDeployer::DeployContainerScenario(const FText& Scenario, IAWSAccountInstance* AwsAccountInstance,
                                                    const FString& ContainerGroupDefinitionName, const FString& ContainerImageName,
                                                    const FString& ContainerImageUri, const FString& IntraContainerLaunchPath, const FString& GameName, const FString& OutConfigFilePath)
 {
-	constexpr auto DeployAbortResult = false;
-	constexpr auto DeployCompletedResult = true;
-	
 	AwsScenarios::IAWSScenario* AwsScenario = AwsDeployerInternal::GetAwsScenarioByName(Scenario, IAWSScenariosCategory::Containers);
-	
-	AwsDeployerInternal::sLatestDeploymentLogErrorMessage.Clear();
-	
-	ShouldBeStopped = false;
-	
-	auto AccountHandle = AwsAccountInstance->GetInstance();
-	
-	if (AccountHandle == nullptr)
-	{
-		AwsDeployerInternal::sLatestDeploymentLogErrorMessage.Set(Deploy::Errors::kAccountIsInvalidText);
-		LastAwsError = GameLift::GAMELIFT_ERROR_GENERAL;
-		UE_LOG(GameLiftCoreLog, Error, TEXT("%s"), Deploy::Logs::kAccountInstanceIsNull);
-		return DeployAbortResult;
-	}
-	
-	if (GameName.Len() > Deploy::kMaxGameNameLength)
-	{
-		AwsDeployerInternal::sLatestDeploymentLogErrorMessage.Set(Deploy::Errors::kGameNameIsTooLongText);
-		LastAwsError = GameLift::GAMELIFT_ERROR_GENERAL;
-		return DeployAbortResult;
-	}
-	
-	auto StdGameName = Convertors::FSToStdS(GameName);
-	GameLiftAccountSetGameName(AccountHandle, StdGameName.c_str());
-	
-	auto ScenarioPath = AwsScenario->GetScenarioPath();
-	auto StdScenarioPath = Convertors::FSToStdS(ScenarioPath);
-	GameLiftAccountSetPluginRootPath(AccountHandle, StdScenarioPath.c_str());
-	
-	auto ScenarioInstancePath = AwsScenario->GetScenarioInstancePath();
-	auto StdScenarioInstancePath = Convertors::FSToStdS(ScenarioInstancePath);
-	GameLiftAccountSetRootPath(AccountHandle, StdScenarioInstancePath.c_str());
-	
-	std::string StdAwsAccountId = GameLiftGetAwsAccountIdByAccountInstance(AccountHandle);
-	
-	if (ShouldBeStopped)
-	{
-		LastAwsError = GameLift::GAMELIFT_ERROR_GENERAL;
-		UE_LOG(GameLiftCoreLog, Error, TEXT("%s"), Deploy::Logs::kDeploymentHasBeenStopped);
-		return DeployAbortResult;
-	}
-	
-	auto ShouldDeployBeAborted = [this](int ErrorCode, auto&& ErrorDebugString)
-	{
-		LastAwsError = ErrorCode;
-	
-		if (LastAwsError != GameLift::GAMELIFT_SUCCESS)
-		{
-			UE_LOG(GameLiftCoreLog, Error, TEXT("%s %s"), ErrorDebugString, *GameLiftErrorAsString::Convert(LastAwsError));
-			return true;
-		}
-	
-		if (ShouldBeStopped)
-		{
-			LastAwsError = GameLift::GAMELIFT_ERROR_GENERAL;
-			UE_LOG(GameLiftCoreLog, Error, TEXT("%s"), Deploy::Logs::kDeploymentHasBeenStopped);
-			return true;
-		}
-	
-		return false;
-	};
-	
-	if (ShouldDeployBeAborted(GameLiftAccountCreateAndSetFunctionsReplacementId(AccountHandle), Deploy::Logs::kCreateAndSetFunctionsReplacementIdFailed))
-	{
-		return DeployAbortResult;
-	}
-	
-	if (ShouldDeployBeAborted(GameLiftAccountGetMainFunctionsReplacementId(AccountHandle, this, AwsDeployerInternal::ReceiveReplacementId),
-		Deploy::Logs::kGetMainFunctionsReplacementIdFailed))
-	{
-		return DeployAbortResult;
-	}
 	
 	auto StdBootstrapBucketName = Convertors::FSToStdS(AwsAccountInstance->GetBucketName());
 	
 	AwsScenarios::ContainerInstanceTemplateParams Params;
-	Params.AccountId = StdAwsAccountId;
+	
+	Params.GameNameParameter = Convertors::FSToStdS(GameName);
+	
+	Params.AccountId = GameLiftGetAwsAccountIdByAccountInstance(AwsAccountInstance->GetInstance());
 	Params.ApiGatewayStageNameParameter = AwsAccountInstance->GetBuildConfiguration();
-	Params.GameNameParameter = Convertors::FSToStdS(AwsAccountInstance->GetGameName());
 	Params.ContainerGroupDefinitionNameParameter = Convertors::FSToStdS(ContainerGroupDefinitionName);
 	Params.ContainerImageNameParameter = Convertors::FSToStdS(ContainerImageName);
 	Params.ContainerImageUriParameter = Convertors::FSToStdS(ContainerImageUri);
 	Params.LambdaZipS3BucketParameter = StdBootstrapBucketName;
-	Params.LambdaZipS3KeyParameter = AwsScenarios::GetLambdaS3Key(StdGameName, MainFunctionsReplacementId);
+	Params.LambdaZipS3KeyParameter = AwsScenarios::GetLambdaS3Key(Convertors::FSToStdS(GameName), MainFunctionsReplacementId);
 	Params.LaunchPathParameter = Convertors::FSToStdS(IntraContainerLaunchPath);
 	
-	if (ShouldDeployBeAborted(
-		AwsScenario->SaveFeatureInstanceTemplate(AwsAccountInstance, Params.ToMap()), 
-		Deploy::Logs::kSaveFeatureInstanceTemplatesFailed))
-	{
-		return DeployAbortResult;
-	}
-	
-	if (ShouldDeployBeAborted(
-		GameLiftAccountUploadFunctions(AccountHandle),
-		Deploy::Logs::kAccountUploadFunctionsFailed))
-	{
-		return DeployAbortResult;
-	}
-	
-	if (ShouldDeployBeAborted(
-		GameLiftAccountCreateOrUpdateMainStack(AccountHandle),
-		Deploy::Logs::kCreateOrUpdateMainStackFailed))
-	{
-		return DeployAbortResult;
-	}
-	
-	if (ShouldDeployBeAborted(
-		GameLiftAccountDeployApiGatewayStage(AccountHandle),
-		Deploy::Logs::kDeployApiGatewayStageFailed))
-	{
-		return DeployAbortResult;
-	}
-	
-	if (ShouldDeployBeAborted(
-		UpdateDeploymentResults(
-			AwsAccountInstance,
-			ScenarioInstancePath,
-			GameName,
-			AwsAccountInstance->GetBucketName(),
-			OutConfigFilePath), 
-		Deploy::Logs::kDeploymentStackStatusFailed))
-	{
-		return DeployAbortResult;
-	}
-	
-	return DeployCompletedResult;
+	return DeployScenarioImpl(AwsAccountInstance, AwsScenario, Params, OutConfigFilePath);
 }
 
 bool AWSScenariosDeployer::StopDeployment(IAWSAccountInstance* AwsAccountInstance)
@@ -384,14 +309,9 @@ bool AWSScenariosDeployer::StopDeployment(IAWSAccountInstance* AwsAccountInstanc
 }
 
 bool AWSScenariosDeployer::DeployScenarioImpl(
-	IAWSAccountInstance* AwsAccountInstance, 
-	AwsScenarios::IAWSScenario* AwsScenario, 
-	const FString& GameName,
-	const FString& BuildOperatingSystem, 
-	const FString& BuildFolderPath, 
-	const FString& BuildFilePath, 
-	const FString& OutConfigFilePath,
-	const FString& ExtraServerResourcesPath
+	IAWSAccountInstance* AwsAccountInstance,
+	AwsScenarios::IAWSScenario* AwsScenario,
+	const AwsScenarios::BaseInstanceTemplateParams& Params, const FString& OutConfigFilePath
 )
 {
 	constexpr auto DeployAbortResult = false;
@@ -411,15 +331,14 @@ bool AWSScenariosDeployer::DeployScenarioImpl(
 		return DeployAbortResult;
 	}
 
-	if (GameName.Len() > Deploy::kMaxGameNameLength)
+	if (Params.GameNameParameter.size() > Deploy::kMaxGameNameLength)
 	{
 		AwsDeployerInternal::sLatestDeploymentLogErrorMessage.Set(Deploy::Errors::kGameNameIsTooLongText);
 		LastAwsError = GameLift::GAMELIFT_ERROR_GENERAL;
 		return DeployAbortResult;
 	}
-
-	auto StdGameName = Convertors::FSToStdS(GameName);
-	GameLiftAccountSetGameName(AccountHandle, StdGameName.c_str());
+	
+	GameLiftAccountSetGameName(AccountHandle, Params.GameNameParameter.c_str());
 
 	auto ScenarioPath = AwsScenario->GetScenarioPath();
 	auto StdScenarioPath = Convertors::FSToStdS(ScenarioPath);
@@ -428,8 +347,6 @@ bool AWSScenariosDeployer::DeployScenarioImpl(
 	auto ScenarioInstancePath = AwsScenario->GetScenarioInstancePath();
 	auto StdScenarioInstancePath = Convertors::FSToStdS(ScenarioInstancePath);
 	GameLiftAccountSetRootPath(AccountHandle, StdScenarioInstancePath.c_str());
-
-	auto StdBuildOperatingSystemParameter = Convertors::FSToStdS(BuildOperatingSystem);
 
 	std::string StdAwsAccountId = GameLiftGetAwsAccountIdByAccountInstance(AccountHandle);
 
@@ -471,33 +388,11 @@ bool AWSScenariosDeployer::DeployScenarioImpl(
 		return DeployAbortResult;
 	}
 
-	auto StdBootstrapBucketName = Convertors::FSToStdS(AwsAccountInstance->GetBucketName());
-	auto StdBuildFolderPath = Convertors::FSToStdS(BuildFolderPath);
-	auto StdExtraServerResourcesPath = Convertors::FSToStdS(ExtraServerResourcesPath);
-
-	if (ShouldDeployBeAborted(AwsScenario->UploadGameServer(AwsAccountInstance, StdBuildFolderPath.c_str(), StdExtraServerResourcesPath.c_str()),
+	if (ShouldDeployBeAborted(AwsScenario->UploadGameServer(AwsAccountInstance, Params.BuildFolderPath.c_str(), Params.ExtraServerResourcesPath.c_str()),
 		Deploy::Logs::kUploadGameServerFailed))
 	{
 		return DeployAbortResult;
 	}
-	
-	std::string StdLaunchPathParameter;
-	if (ShouldDeployBeAborted(AwsScenario->CreateLaunchPathParameter(BuildOperatingSystem, BuildFolderPath, BuildFilePath, StdLaunchPathParameter),
-		Deploy::Logs::kCreateLaunchPathParameterFailed))
-	{
-		return DeployAbortResult;
-	}
-
-
-	AwsScenarios::ManagedEC2InstanceTemplateParams Params;
-	Params.GameNameParameter = Convertors::FSToStdS(AwsAccountInstance->GetGameName());
-	Params.BuildOperatingSystemParameter = StdBuildOperatingSystemParameter;
-	Params.BuildS3BucketParameter = StdBootstrapBucketName;
-	Params.LambdaZipS3BucketParameter = StdBootstrapBucketName;
-	Params.LambdaZipS3KeyParameter = AwsScenarios::GetLambdaS3Key(StdGameName, MainFunctionsReplacementId);
-	Params.ApiGatewayStageNameParameter = AwsAccountInstance->GetBuildConfiguration();
-	Params.AccountId = StdAwsAccountId;
-	Params.LaunchPathParameter = StdLaunchPathParameter;
 
 	if (ShouldDeployBeAborted(AwsScenario->SaveFeatureInstanceTemplate(AwsAccountInstance, Params.ToMap()),
 		Deploy::Logs::kSaveFeatureInstanceTemplatesFailed))
@@ -520,7 +415,7 @@ bool AWSScenariosDeployer::DeployScenarioImpl(
 		return DeployAbortResult;
 	}
 
-	if (ShouldDeployBeAborted(UpdateDeploymentResults(AwsAccountInstance, ScenarioInstancePath, GameName, AwsAccountInstance->GetBucketName(), OutConfigFilePath), 
+	if (ShouldDeployBeAborted(UpdateDeploymentResults(AwsAccountInstance, ScenarioInstancePath, FString(Params.GameNameParameter.c_str()), AwsAccountInstance->GetBucketName(), OutConfigFilePath), 
 		Deploy::Logs::kDeploymentStackStatusFailed))
 	{
 		return DeployAbortResult;

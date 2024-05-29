@@ -24,14 +24,18 @@ namespace AwsScenarios
 
 	struct BaseInstanceTemplateParams
 	{
+		std::string GameNameParameter;
+		std::string BuildFolderPath;
+		std::string ExtraServerResourcesPath;
+		
 		virtual ~BaseInstanceTemplateParams() = default;
+		
 		virtual void FromMap(const TMap<FString, FString>& InMap) = 0;
 		virtual TMap<FString, FString> ToMap() const = 0;
 	};
 
 	struct ManagedEC2InstanceTemplateParams : BaseInstanceTemplateParams
 	{
-		std::string GameNameParameter;
 		std::string BuildOperatingSystemParameter;
 		std::string BuildS3BucketParameter;
 		std::string LambdaZipS3BucketParameter;

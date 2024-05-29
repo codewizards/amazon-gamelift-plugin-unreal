@@ -57,14 +57,9 @@ public:
 private:
 
 	bool DeployScenarioImpl(
-		IAWSAccountInstance* AccountInstance, 
-		AwsScenarios::IAWSScenario* AwsScenario, 
-		const FString& GameName, 
-		const FString& BuildOperatingSystem, 
-		const FString& BuildFolderPath, 
-		const FString& BuildFilePath, 
-		const FString& OutConfigFilePath, 
-		const FString& ExtraServerResourcesPath
+		IAWSAccountInstance* AccountInstance,
+		AwsScenarios::IAWSScenario* AwsScenario, const AwsScenarios::BaseInstanceTemplateParams& Params, const FString&
+		OutConfigFilePath
 	);
 	int UpdateDeploymentResults(
 		IAWSAccountInstance* AccountInstance, 
