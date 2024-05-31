@@ -422,8 +422,8 @@ namespace Menu
 		static const auto kContainerImageURIText = NSLOCTEXT("SContainerDeploymentFields", "ContainerImageURI_Text", "Container Image URI ");
 		static const auto kContainerImageURIHint = NSLOCTEXT("SContainerDeploymentFields", "ContainerImageURI_Hint", "URI referencing a Container Image in ECR which contains your game server.");
 		
-		static const auto kIntraContainerLaunchPathTitle = NSLOCTEXT("SContainerDeploymentFields", "IntraContainerLaunchPathTitle_Title", "Intra-Container Launch Path");
-		static const auto kIntraContainerLaunchPathText = NSLOCTEXT("SContainerDeploymentFields", "IntraContainerLaunchPath_Text", "Intra-Container Launch Path");
+		static const auto kIntraContainerLaunchPathTitle = NSLOCTEXT("SContainerDeploymentFields", "IntraContainerLaunchPathTitle_Title", "Container Server Launch Path");
+		static const auto kIntraContainerLaunchPathText = NSLOCTEXT("SContainerDeploymentFields", "IntraContainerLaunchPath_Text", "Container Server Launch Path");
 		static const auto kIntraContainerLaunchPathHint = NSLOCTEXT("SContainerDeploymentFields", "IntraContainerLaunchPath_Hint", "The path to the game server executable within the Container.");
 
 		//Deplyment Parameters

@@ -8,6 +8,7 @@
 #include "ScenarioWithParameters.h"
 #include "GameLiftCore/Private/AwsScenarios/IAwsScenario.h"
 #include "GameLiftCore/Public/IAWSAccountInstance.h"
+#include "aws/gamelift/core/errors.h"
 
 namespace AwsScenarios
 {
@@ -58,11 +59,11 @@ namespace AwsScenarios
 		
 		virtual int UploadGameServer(IAWSAccountInstance* AwsAccountInstance, const std::string& ServerFolderPath, const std::string& ExtraServerResourcesPath) override
 		{
-			return 0;
+			return GameLift::GAMELIFT_SUCCESS;
 		};
 		virtual int CreateLaunchPathParameter(const FString& BuildOperatingSystem, const FString& BuildFolderPath, const FString& BuildFilePath, std::string& StdLaunchPathParameter) override
 		{
-			return 0;
+			return GameLift::GAMELIFT_SUCCESS;
 		};
 	};
 } // namespace AwsScenarios

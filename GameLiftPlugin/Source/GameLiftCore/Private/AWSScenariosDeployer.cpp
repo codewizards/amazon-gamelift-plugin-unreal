@@ -80,7 +80,6 @@ namespace AwsDeployerInternal
 		return ScenarioMap;
 	}
 	
-
 	const auto& GetAwsScenarios(const IAWSScenariosCategory Category)
 	{
 		static TMap<FString, TUniquePtr<AwsScenarios::IAWSScenario>>
@@ -181,13 +180,13 @@ void AWSScenariosDeployer::SetLastApiGatewayEndpoint(const FString& ApiGateway)
 }
 
 bool AWSScenariosDeployer::DeployScenario(
-	const FText& Scenario,
-	IAWSAccountInstance* AwsAccountInstance,
+	const FText& Scenario, 
+	IAWSAccountInstance* AwsAccountInstance, 
 	const FString& GameName,
 	const FString& BuildOperatingSystem,
-	const FString& BuildFolderPath,
-	const FString& BuildFilePath,
-	const FString& OutConfigFilePath,
+	const FString& BuildFolderPath, 
+	const FString& BuildFilePath, 
+	const FString& OutConfigFilePath, 
 	const FString& ExtraServerResourcesPath
 )
 {
