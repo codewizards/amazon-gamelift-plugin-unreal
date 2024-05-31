@@ -14,33 +14,6 @@ Parameters:
     Type: String
     Default: v1
     Description: Name of the Api Gateway stage
-
-  BuildNameParameter:
-    Type: String
-    Default: Sample GameLift Build
-    Description: Name of the build
-
-  BuildOperatingSystemParameter:
-    Type: String
-    Default: WINDOWS_2016
-    Description: Operating system of the build
-
-  BuildServerSdkVersionParameter:
-    Type: String
-    Description: GameLift Server SDK version used in the server build
-
-  BuildS3BucketParameter:
-    Type: String
-    Description: Bucket that stores the server build
-
-  BuildS3KeyParameter:
-    Type: String
-    Description: Key of the server build in the S3 bucket
-
-  BuildVersionParameter:
-    Type: String
-    Description: Version number of the build
-    
   
   ContainerGroupDefinitionNameParameter:
     Type: String
@@ -99,10 +72,6 @@ Parameters:
   LambdaZipS3KeyParameter:
     Type: String
     Description: S3 key that stores the lambda function zip
-
-  LaunchParametersParameter:
-    Type: String
-    Description: Parameters used to launch the game server process
     
   LaunchPathParameter:
     Type: String
